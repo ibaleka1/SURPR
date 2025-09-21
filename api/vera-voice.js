@@ -1,4 +1,4 @@
-// Serverless handler for ElevenLabs TTS on Vercel (Node 20+)
+// Serverless handler for ElevenLabs TTS on Vercel (Node 20 default)
 module.exports = async (req, res) => {
   try {
     if (req.method !== 'POST') {
