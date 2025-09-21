@@ -399,7 +399,11 @@ btnClear.addEventListener('click', ()=>{
 
 /* ========= greet ========= */
 addRow('VERA', 'Hi. I am with you. Tap the orb and tell me what you notice in your body.');
-(async()=>{ await speak('Hi. I am with you. Tap the orb and tell me what you notice in your body.'); })();
+(async()=>{ 
+  try{
+    await speak('Hi. I am with you. Tap the orb and tell me what you notice in your body.');
+  }catch(_){}
+})();
 </script>
 </body>
 </html>
