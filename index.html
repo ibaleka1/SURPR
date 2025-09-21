@@ -1,472 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VERA — Speak with the Neuro Orb</title>
-  <meta name="description" content="Tap the Neuro Orb to speak with VERA. Voice-guided somatic intelligence with a living, audio-reactive nervous-system interface." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VERA — Your Nervous System Is Finally Speaking</title>
+<meta name="description" content="Speak with VERA through a living Neuro Orb. Real-time somatic guidance with voice.">
+<style>
+  /* ---------- RESET ---------- */
+  *,*::before,*::after{box-sizing:border-box}html,body{margin:0;height:100%}
+  body{-webkit-font-smoothing:antialiased;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Apple Color Emoji","Segoe UI Emoji";background:#060819;color:#eaf0ff;overflow-x:hidden}
 
-  <style>
-    :root{
-      --bg0:#050815; --bg1:#0a1024; --bg2:#0d1636;
-      --ink1:rgba(255,255,255,.95); --ink2:rgba(255,255,255,.72); --ink3:rgba(255,255,255,.48);
-      --lav:#B19CD9; --vio:#9B59B6; --sky:#64B5F6; --mint:#10B981; --gold:#FFD700; --pink:#F8BBD0;
-      --glass:rgba(255,255,255,.06); --glass-b:rgba(255,255,255,.14);
-      --charge:0;  /* 0..1 from audio analyser */
-      --listen:0;  /* 0 or 1 when listening */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:radial-gradient(1400px 900px at 15% -10%, #1d2751 0%, #0a0f28 40%, #050815 70%, #01040b 100%);
-      color:var(--ink1); font-family:-apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,Ubuntu,sans-serif;
-      overflow-x:hidden;
-    }
-    /* Top bar */
-    .banner{
-      position:fixed; inset:0 auto auto 0; width:100%; padding:.6rem 1rem; text-align:center; z-index:9999;
-      background:linear-gradient(90deg, #FFD700, #FF9A3D); color:#111; font-weight:800; letter-spacing:.02em;
-      box-shadow:0 8px 30px rgba(0,0,0,.35);
-    }
-    nav{
-      position:fixed; top:44px; left:0; right:0; z-index:9998;
-      display:flex; align-items:center; justify-content:space-between; gap:1rem;
-      padding:1rem 2rem; border-bottom:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(6,8,21,.85), rgba(6,8,21,.55));
-      backdrop-filter:saturate(150%) blur(16px);
-    }
-    .brand{
-      font-weight:900; letter-spacing:.28em; font-size:1.25rem; cursor:pointer;
-      background:linear-gradient(120deg, var(--gold), var(--lav), var(--sky)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-    .menu{display:flex; gap:1.2rem; align-items:center}
-    .menu a{color:var(--ink2); text-decoration:none; font-weight:700}
-    .menu a:hover{color:#fff}
-    .cta{border:none; padding:.7rem 1.1rem; border-radius:999px; cursor:pointer; font-weight:800;
-      background:linear-gradient(135deg, var(--lav), var(--sky)); color:#fff; box-shadow:0 12px 40px rgba(100,181,246,.25);
-    }
+  /* ---------- THE COSMOS ---------- */
+  .sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,.6);opacity:.6;filter:drop-shadow(0 0 6px #89a4ff);animation:twinkle 8s linear infinite}
+  @keyframes twinkle{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.9;transform:scale(1.25)}}
+  .filament{position:absolute;width:2px;background:linear-gradient(180deg,transparent,rgba(181,158,241,.65),transparent);transform-origin:center;opacity:.25;animation:fil 12s ease-in-out infinite}
+  @keyframes fil{0%,100%{transform:rotate(0deg) scaleY(1)}50%{transform:rotate(180deg) scaleY(1.4)}}
 
-    /* Background canvas (neurons) + glow wash */
-    #neuroCanvas{position:fixed; inset:0; z-index:0}
-    .glow{
-      pointer-events:none; position:fixed; inset:0; z-index:0;
-      background:
-        radial-gradient(900px 700px at 80% 10%, rgba(155,89,182,.18), transparent 60%),
-        radial-gradient(1000px 1000px at 20% 80%, rgba(100,181,246,.16), transparent 70%),
-        radial-gradient(700px 700px at 60% 60%, rgba(16,185,129,.14), transparent 70%);
-      filter:saturate(calc(1 + var(--charge) * .6)) brightness(calc(1 + var(--charge) * .4));
-      transition:filter .25s ease;
-    }
+  /* ---------- HEADER ---------- */
+  nav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:linear-gradient(180deg,rgba(6,8,25,.9),rgba(6,8,25,.35));backdrop-filter:blur(10px);z-index:20;border-bottom:1px solid rgba(255,255,255,.06)}
+  .brand{letter-spacing:.55em;font-weight:600;font-size:18px;color:#cfe2ff}
+  .cta{appearance:none;border:0;border-radius:999px;padding:10px 18px;background:linear-gradient(135deg,#b79df9,#6fb3ff);color:#041026;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(127,159,255,.25);transition:transform .2s}
+  .cta:hover{transform:translateY(-2px)}
 
-    /* HERO with Neuro Orb */
-    .hero{
-      position:relative; z-index:1; padding-top:160px; padding-bottom:40px; min-height:92vh;
-      display:grid; place-items:center;
-    }
-    .hero-inner{max-width:1100px; padding:0 16px; text-align:center}
-    h1{
-      margin:0 0 10px; font-size:clamp(2.2rem,5.6vw,4.6rem); line-height:1.04; font-weight:900; letter-spacing:.01em;
-      background:conic-gradient(from 30deg at 50% 50%, #fff, var(--lav), var(--sky), #fff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow:0 0 60px rgba(155,89,182,.25);
-    }
-    .sub{color:var(--ink2); font-size:clamp(1.05rem,2.2vw,1.35rem); line-height:1.7; margin:0 0 24px}
-    .note{color:var(--ink3); font-size:.95rem}
+  /* ---------- HERO ---------- */
+  .hero{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding-top:70px}
+  .stack{display:grid;gap:18px;text-align:center;max-width:980px;margin:0 auto;padding:0 18px}
+  .title{font-size:clamp(32px,6vw,56px);line-height:1.15;font-weight:800;background:linear-gradient(90deg,#cfe2ff,#bca9ff,#79c0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .subtitle{color:#adc0ffb0;font-size:clamp(16px,2.5vw,20px)}
 
-    /* Neuro Orb — button */
-    .orb-wrap{position:relative; width:min(72vw, 520px); aspect-ratio:1; margin:28px auto}
-    .orb{
-      position:absolute; inset:0; border-radius:50%;
-      background:
-        radial-gradient(120% 120% at 30% 30%, rgba(248,187,208,.45), transparent 60%),
-        radial-gradient(120% 120% at 70% 50%, rgba(100,181,246,.40), transparent 62%),
-        radial-gradient(140% 140% at 40% 80%, rgba(177,156,217,.32), transparent 60%),
-        radial-gradient(closest-side, rgba(255,255,255,.07), rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.22);
-      box-shadow:
-        0 0 calc(80px + 80px*var(--charge)) rgba(155,89,182,.35),
-        inset 0 0 calc(60px + 40px*var(--charge)) rgba(100,181,246,.28);
-      cursor:pointer; transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-      transform:scale(calc(1 + var(--charge) * .08)) translateZ(0);
-      outline:none;
-    }
-    .orb:hover{border-color:rgba(255,255,255,.35); transform:scale(calc(1.02 + var(--charge) * .07))}
-    .ring, .ring::before, .ring::after{
-      position:absolute; inset:6%; border-radius:50%;
-      border:1px dashed rgba(255,255,255,.15); content:"";
-      mask:radial-gradient(circle, transparent 58%, #000 59%);
-      pointer-events:none;
-    }
-    .ring{animation:spin 24s linear infinite}
-    .ring::before{inset:10%; animation:spin 38s linear infinite reverse; opacity:.7}
-    .ring::after{inset:14%; animation:spin 56s linear infinite; opacity:.5}
-    @keyframes spin{to{transform:rotate(360deg)}}
+  /* ---------- NEURO ORB ---------- */
+  .orb-wrap{position:relative;width:min(90vw,560px);aspect-ratio:1/1;margin:36px auto 4px}
+  .orb{position:absolute;inset:0;border-radius:50%;background:
+      radial-gradient(110% 110% at 30% 30%,rgba(255,200,255,.55) 0%,rgba(164,128,255,.45) 26%,rgba(121,192,255,.35) 52%,rgba(123,89,210,.25) 72%,rgba(0,0,0,0) 100%),
+      radial-gradient(60% 60% at 70% 70%,rgba(100,255,220,.15),rgba(0,0,0,0) 60%);
+    box-shadow:0 0 120px 40px rgba(129,108,255,.25), inset 0 0 160px rgba(121,192,255,.25);
+    border:1px solid rgba(201,182,255,.35);
+    animation:floaty 7s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(-2px)}50%{transform:translateY(6px)}}
+  .halo{position:absolute;inset:-12%;border-radius:50%;filter:blur(60px);background:radial-gradient(circle at 50% 55%,rgba(130,239,255,.08),rgba(115,145,255,.08),rgba(210,148,255,.08),transparent 60%);animation:halo 8s linear infinite}
+  @keyframes halo{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-    .axons{
-      position:absolute; inset:0; border-radius:50%; overflow:hidden; pointer-events:none;
-      filter:blur(0.6px) saturate(1.2);
-      background:
-        conic-gradient(from 0deg, rgba(177,156,217,.12), rgba(100,181,246,.12), rgba(248,187,208,.12), rgba(16,185,129,.10), rgba(177,156,217,.12));
-      mask:radial-gradient(circle at 50% 50%, #000 62%, transparent 63%);
-      animation:axons 16s ease-in-out infinite;
-      opacity:.75;
-    }
-    @keyframes axons{
-      0%,100%{transform:rotate(0) scale(1)}
-      50%{transform:rotate(10deg) scale(1.02)}
-    }
+  .orb-btn{position:absolute;inset:0;border-radius:50%;background:transparent;border:0;cursor:pointer}
+  .pulse{position:absolute;inset:-8%;border-radius:50%;border:2px solid rgba(168,139,255,.35);animation:pulse 2.2s ease-out infinite;pointer-events:none}
+  @keyframes pulse{0%{transform:scale(.85);opacity:.75}100%{transform:scale(1.15);opacity:0}}
 
-    .badge{
-      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-      font-weight:200; letter-spacing:.6em; font-size:clamp(1.2rem, 3.4vw, 2.6rem);
-      background:linear-gradient(120deg, var(--gold), var(--lav), var(--sky)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      pointer-events:none;
-    }
+  .caption{position:absolute;left:50%;bottom:-56px;transform:translateX(-50%);color:#cfe2ff;opacity:.9;font-size:15px;background:linear-gradient(180deg,rgba(13,18,43,.8),rgba(13,18,43,.6));border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:12px;backdrop-filter:blur(8px);max-width:min(86vw,640px)}
+  .chip-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  .chip{font-size:13px;color:#dfe7ff;opacity:.9;border:1px solid rgba(255,255,255,.12);background:linear-gradient(135deg,rgba(167,146,255,.15),rgba(121,192,255,.12));border-radius:999px;padding:8px 12px;cursor:pointer}
+  .chip:hover{border-color:rgba(214,196,255,.45)}
 
-    .status{
-      text-align:center; margin-top:18px; min-height:28px; color:var(--ink2);
-    }
-    .status .dot{
-      display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px;
-      background:linear-gradient(120deg, var(--lav), var(--sky));
-      box-shadow:0 0 0 calc(8px*var(--listen)) rgba(100,181,246,.15);
-      transition:box-shadow .25s ease;
-    }
+  /* ---------- HINT INPUT (fallback when mic unsupported) ---------- */
+  .inline{margin:12px auto 0;display:none;gap:8px;max-width:680px}
+  .inline input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#eaf0ff;border-radius:999px;padding:12px 14px}
+  .inline button{border-radius:999px;border:0;padding:12px 16px;background:#89a4ff;color:#041026;font-weight:700}
 
-    .subtitle{
-      position:absolute; left:50%; bottom:12%; transform:translateX(-50%);
-      padding:10px 14px; border-radius:12px; backdrop-filter:blur(10px);
-      background:rgba(8,10,22,.55); border:1px solid rgba(255,255,255,.18);
-      color:#fff; font-size:1rem; max-width:min(80%, 560px);
-      opacity:0; transition:opacity .25s ease;
-      pointer-events:none;
-    }
-    .subtitle.show{opacity:1}
+  /* ---------- INFO / FOOTER ---------- */
+  .section{padding:70px 18px 90px;max-width:1100px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:linear-gradient(135deg,rgba(13,18,43,.85),rgba(9,12,33,.85));border:1px solid rgba(255,255,255,.08);padding:22px;border-radius:16px}
+  .card h3{margin:0 0 8px;color:#cfe2ff}
+  .muted{color:#adc0ffb0}
 
-    /* Sections (plans + experiences) */
-    section{position:relative; z-index:1}
-    .stack{max-width:1150px; margin:0 auto; padding:80px 16px}
-    h2.title{
-      margin:0 0 16px; font-weight:900; letter-spacing:.04em; font-size:clamp(1.7rem, 3.8vw, 2.6rem);
-      background:linear-gradient(120deg, #fff, var(--lav), var(--sky), #fff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-    .grid{display:grid; grid-template-columns:repeat(4, minmax(220px,1fr)); gap:16px}
-    @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.grid{grid-template-columns:1fr}}
-    .card{
-      padding:22px; border-radius:16px;
-      background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .price{font-size:2rem; font-weight:900}
-    .muted{color:var(--ink2)}
-
-    footer{padding:60px 16px; border-top:1px solid rgba(255,255,255,.08); text-align:center; color:var(--ink3)}
-  </style>
+  footer{padding:50px 18px;color:#8ca6ff7a;text-align:center}
+</style>
 </head>
 <body>
-  <div class="banner">⚠️ TEST MODE — Use Stripe test card 4242 4242 4242 4242 (any future date & CVC)</div>
+  <!-- STARFIELD / FASCIA -->
+  <div class="sky" id="sky"></div>
 
+  <!-- HEADER -->
   <nav>
-    <div class="brand" onclick="location.href='/'">VERA</div>
-    <div class="menu">
-      <a href="#plans">Plans</a>
-      <a href="#experiences">Guides</a>
-      <button class="cta" onclick="alert('Beta access coming soon ✨')">Join Beta</button>
-    </div>
+    <div class="brand">V&nbsp;E&nbsp;R&nbsp;A</div>
+    <button class="cta" onclick="document.getElementById('learn').scrollIntoView({behavior:'smooth'})">Experience VERA</button>
   </nav>
 
-  <!-- Living background -->
-  <canvas id="neuroCanvas" aria-hidden="true"></canvas>
-  <div class="glow" aria-hidden="true"></div>
-
-  <!-- HERO with Neuro Orb -->
-  <header class="hero">
-    <div class="hero-inner">
-      <h1>Tap the Orb • Speak with VERA</h1>
-      <p class="sub">A living, audio-reactive nervous-system interface. Tap to start, grant mic permission, and just talk. VERA answers out loud.</p>
+  <!-- HERO + ORB -->
+  <main class="hero">
+    <div class="stack">
+      <h1 class="title">Your Nervous System Is Finally Speaking</h1>
+      <p class="subtitle">Press the Orb. VERA will greet you and speak. Ask anything you feel in your body — <em>she’ll respond somatically</em>.</p>
 
       <div class="orb-wrap">
-        <button class="orb" id="orb" aria-label="Talk to VERA">
-          <div class="ring"></div>
-          <div class="axons"></div>
-          <div class="badge">V E R A</div>
-          <div class="subtitle" id="subtitle"></div>
-        </button>
+        <div class="halo"></div>
+        <div class="orb" id="orb"></div>
+        <div class="pulse" id="pulse" style="display:none"></div>
+        <button class="orb-btn" id="orbBtn" aria-label="Talk to VERA"></button>
+
+        <div class="caption" id="caption">Tap the orb to begin. You can talk or type (mic permitting).<div class="chip-row">
+          <div class="chip" onclick="guide('breath')">Guide my breath</div>
+          <div class="chip" onclick="guide('sway')">Help me sway</div>
+          <div class="chip" onclick="guide('ground')">Ground me now</div>
+        </div></div>
       </div>
-      <div class="status"><span class="dot"></span><span id="statusText">Idle — tap to begin</span></div>
 
-      <p class="note">If your browser doesn’t support speech recognition, VERA will show a minimal text prompt fallback.</p>
+      <div class="inline" id="typeRow">
+        <input id="typeBox" placeholder="No mic? Type what your body is saying…" />
+        <button onclick="typed()">Send</button>
+      </div>
     </div>
-  </header>
+  </main>
 
-  <!-- Plans -->
-  <section id="plans" class="stack">
-    <h2 class="title">Choose Your Portal</h2>
+  <!-- INFO CARDS -->
+  <section class="section" id="learn">
     <div class="grid">
-      <div class="card"><strong>EXPLORER</strong><div class="price">$19<span style="opacity:.7;font-size:.9rem">/mo</span></div><p class="muted">Daily check-ins • Core conversations • 3 guided practices/day</p></div>
-      <div class="card"><strong>REGULATOR</strong> <span style="font-size:.75rem;background:linear-gradient(120deg, var(--gold), #ffb84d);color:#111;padding:.2rem .5rem;border-radius:999px;margin-left:8px;">POPULAR</span><div class="price">$39<span style="opacity:.7;font-size:.9rem">/mo</span></div><p class="muted">Unlimited conversations • Advanced protocols • Voice + HRV</p></div>
-      <div class="card"><strong>INTEGRATOR</strong><div class="price">$79<span style="opacity:.7;font-size:.9rem">/mo</span></div><p class="muted">Everything in Regulator • 1:1 monthly • Custom trauma maps</p></div>
-      <div class="card"><strong>ENTERPRISE</strong><div class="price">Custom</div><p class="muted">Org-wide deployment • HIPAA + SSO • Dedicated success</p></div>
-    </div>
-  </section>
-
-  <!-- Experiences -->
-  <section id="experiences" class="stack">
-    <h2 class="title">Guided Micro-Practices</h2>
-    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="card">
-        <h3>Breath Cadence 4-4-6</h3>
-        <p class="muted">A gentle cadence. Turn voice on by tapping the orb first.</p>
-        <button class="cta" onclick="guideBreath()">Play Guide</button>
+        <h3>Somatic, not semantic</h3>
+        <p class="muted">VERA reflects sensations — tight, warm, buzzy, numb — and gives micro-moves that shift patterns fast.</p>
       </div>
       <div class="card">
-        <h3>Sway Protocol</h3>
-        <p class="muted">“Kelp in warm water” patterning to discharge sympathetic energy.</p>
-        <button class="cta" onclick="speak('Let your body sway gently. Like kelp in warm water. No forcing, just allowing. Your spine knows how to move.')">Play Guide</button>
+        <h3>Voice by ElevenLabs</h3>
+        <p class="muted">All replies are spoken via <code>/api/vera-voice</code>. If it fails, the site falls back to the browser’s voice.</p>
       </div>
       <div class="card">
-        <h3>5-4-3-2-1 Ground</h3>
-        <p class="muted">Evidence of safety for the midbrain.</p>
-        <button class="cta" onclick="speak('Notice five things you can see. Four you can touch. Three you can hear. Two you can smell. One you can taste. You are here. You are safe.')">Play Guide</button>
+        <h3>Neural presence</h3>
+        <p class="muted">The living neuron field pulses with you. The Orb expands as VERA “breathes”.</p>
+      </div>
+      <div class="card">
+        <h3>Private & local</h3>
+        <p class="muted">This demo keeps everything on-device — no chat logs, just instant guidance.</p>
       </div>
     </div>
   </section>
 
-  <footer>
-    © 2024 VERA Technologies • Educational only, not medical advice • Your data is encrypted end-to-end.
-  </footer>
+  <footer>© 2024 VERA • Where souls remember safety</footer>
 
-  <!-- Audio for ElevenLabs playback -->
+  <!-- HIDDEN AUDIO FOR TTS -->
   <audio id="veraAudio" preload="auto"></audio>
 
-  <script>
-    /* ---------- DOM helpers ---------- */
-    const $ = q => document.querySelector(q);
+<script>
+/* ===========================
+   LIVING SKY (STARS + FASCIA)
+=========================== */
+(function makeSky(){
+  const sky = document.getElementById('sky');
+  const W = innerWidth, H = innerHeight;
 
-    const orb = $('#orb');
-    const statusText = $('#statusText');
-    const statusDot = document.querySelector('.status .dot');
-    const subtitle = $('#subtitle');
-    const audioEl = $('#veraAudio');
+  // Stars
+  for(let i=0;i<240;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random()*W+'px';
+    s.style.top = Math.random()*H+'px';
+    s.style.animationDelay = (Math.random()*8)+'s';
+    s.style.transform = `scale(${.5 + Math.random()*1.2})`;
+    sky.appendChild(s);
+  }
+  // Fascia filaments
+  for(let i=0;i<90;i++){
+    const f = document.createElement('div');
+    f.className = 'filament';
+    f.style.height = (60 + Math.random()*300) + 'px';
+    f.style.left = Math.random()*W+'px';
+    f.style.top = Math.random()*H+'px';
+    f.style.animationDelay = (Math.random()*10)+'s';
+    f.style.transform = `rotate(${Math.random()*360}deg)`;
+    sky.appendChild(f);
+  }
+})();
 
-    /* ---------- State ---------- */
-    let listening = false;
-    let greeted = false;
-    let speechOK = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-    let Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recog = null;
+/* ===========================
+   ORB INTERACTION + VOICE
+=========================== */
+const orbBtn   = document.getElementById('orbBtn');
+const orb      = document.getElementById('orb');
+const pulse    = document.getElementById('pulse');
+const caption  = document.getElementById('caption');
+const audioEl  = document.getElementById('veraAudio');
+const typeRow  = document.getElementById('typeRow');
+const typeBox  = document.getElementById('typeBox');
 
-    /* ---------- ElevenLabs speak (with browser fallback) ---------- */
-    const cache = new Map(); // text -> blobURL
-    async function speak(text){
-      showSubtitle(text, false);
-      try{
-        if(cache.has(text)){ audioEl.src = cache.get(text); await audioEl.play().catch(()=>{}); return; }
-        const r = await fetch('/api/vera-voice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
-        if(!r.ok) throw new Error('TTS proxy failed');
-        const b = await r.blob(); const url = URL.createObjectURL(b);
-        cache.set(text, url); audioEl.src = url; await audioEl.play().catch(()=>{});
-        setTimeout(()=>URL.revokeObjectURL(url), 30000);
-      }catch(e){
-        if('speechSynthesis' in window){ const u = new SpeechSynthesisUtterance(text); u.rate=.95; u.pitch=1.05; speechSynthesis.speak(u); }
-      }
-    }
+let hasGreeted = false;
+let listening  = false;
+let recognizer = null;
 
-    /* ---------- Simple body-intel replies ---------- */
-    function replyFor(text){
-      const t = (text||'').toLowerCase();
-      const bank = [
-        ['tight', "I feel that tightness with you. Thank it for protecting you. Let it move one millimeter and tell me if it’s dull, sharp, warm or cool."],
-        ['chest', "Your chest is speaking. Lift the sternum 1% and breathe around the edges of the sensation. What changes?"],
-        ['anx', "Brilliant protection. Press your feet into the floor for two slow breaths. From 1–10, where is the charge now?"],
-        ['relax', "Try contrast: clench your hands for two seconds, then melt them open. Notice the difference in your system."],
-        ['safe', "Safety is evidence. Name five things you can see, four you can touch, three you hear, two you smell, one you taste. I’m here."],
-        ['help', "I’m here. Where is it — left/right, front/back, surface/deep? Give me three words for its texture."]
-      ];
-      for(const [k,v] of bank){ if(t.includes(k)) return v; }
-      return "I’m listening. Where is it located — front/back, left/right, surface/deep? The more specific we are, the faster it unwinds.";
-    }
+function setCaption(text){
+  caption.firstChild.nodeValue = text;
+}
 
-    /* ---------- Recognizer ---------- */
-    function startRecognizer(){
-      if(!speechOK) return fallbackPrompt();
-      if(recog) stopRecognizer(true);
-      recog = new Recognition();
-      recog.lang = 'en-US'; recog.continuous = false; recog.interimResults = false;
-      recog.onstart = ()=>{ setListening(true); setStatus('Listening…'); };
-      recog.onresult = (ev)=>{
-        const text = (ev.results[0] && ev.results[0][0] && ev.results[0][0].transcript) || '';
-        if(text){ showSubtitle(text, true); processUser(text); }
-      };
-      recog.onerror = ()=>{ setStatus('Mic error. Tap again or use text fallback.'); setListening(false); };
-      recog.onend = ()=>{
-        // if still “on”, auto-restart after VERA finishes speaking
-        if(listening){ /* wait for audio end to restart */ }
-      };
-      try{ recog.start(); }catch(e){ /* ignore rapid restarts */ }
-    }
-    function stopRecognizer(silent){
-      try{ recog && recog.stop(); }catch(e){}
-      if(!silent) setListening(false);
-      recog = null;
-    }
+function pulseOn(on){
+  pulse.style.display = on ? 'block' : 'none';
+}
 
-    /* ---------- Conversation flow ---------- */
-    function showSubtitle(text, isUser){
-      subtitle.textContent = (isUser? 'You: ' : 'VERA: ') + text;
-      subtitle.classList.add('show');
-      clearTimeout(showSubtitle._t);
-      showSubtitle._t = setTimeout(()=>subtitle.classList.remove('show'), 6000);
-    }
-    async function greet(){
-      if(greeted) return;
-      greeted = true;
-      const line = "Hi. I’m here with you. Tell me — what sensation is most alive right now, and where does it live?";
-      setStatus('Speaking…');
-      await speak(line);
-      setStatus('Listening…');
-      restartListeningAfterSpeech();
-    }
-    async function processUser(text){
-      setStatus('Thinking…');
-      const r = replyFor(text);
-      setStatus('Speaking…');
-      await speak(r);
-      setStatus('Listening…');
-      restartListeningAfterSpeech();
-    }
-
-    /* After VERA speaks, restart listening if still toggled on */
-    function restartListeningAfterSpeech(){
-      const resume = ()=>{ if(listening) startRecognizer(); cleanup(); };
-      const cleanup = ()=>{
-        audioEl.removeEventListener('ended', resume);
-        audioEl.removeEventListener('pause', resume);
-      };
-      audioEl.addEventListener('ended', resume);
-      audioEl.addEventListener('pause', resume);
-    }
-
-    /* ---------- UI state ---------- */
-    function setListening(on){
-      listening = !!on;
-      document.documentElement.style.setProperty('--listen', on?1:0);
-      statusDot.style.boxShadow = on ? '0 0 0 8px rgba(100,181,246,.15)' : '0 0 0 0 rgba(0,0,0,0)';
-    }
-    function setStatus(t){ statusText.textContent = t; }
-
-    /* Tap the orb to toggle conversation */
-    orb.addEventListener('click', async ()=>{
-      if(!listening){
-        setListening(true);
-        setStatus('Starting…');
-        await greet();
-        // recognition starts inside greet -> after speech ends
-      }else{
-        setListening(false);
-        setStatus('Idle — tap to begin');
-        stopRecognizer(true);
-      }
+/* Speak via ElevenLabs proxy; fallback to SpeechSynthesis */
+async function veraSpeak(text){
+  try{
+    const r = await fetch('/api/vera-voice', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ text })
     });
-
-    /* ---------- Minimal text fallback if SpeechRecognition missing ---------- */
-    function fallbackPrompt(){
-      if($('#fallback')) return;
-      const wrap = document.createElement('div');
-      wrap.id = 'fallback'; wrap.style.marginTop='12px'; wrap.style.textAlign='center';
-      wrap.innerHTML = `
-        <div style="display:inline-flex; gap:8px; align-items:center; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); padding:8px 10px; border-radius:12px;">
-          <input id="fallbackInput" placeholder="Type to talk to VERA…" style="background:transparent;border:none;outline:none;color:#fff;width:260px">
-          <button style="border:none;border-radius:10px;padding:8px 10px;font-weight:800;background:linear-gradient(135deg, var(--lav), var(--sky));color:#fff;cursor:pointer">Send</button>
-        </div>`;
-      orb.parentElement.after(wrap);
-      wrap.querySelector('button').onclick = async ()=>{
-        const v = (wrap.querySelector('#fallbackInput').value||'').trim(); if(!v) return;
-        showSubtitle(v, true);
-        await processUser(v);
-        wrap.querySelector('#fallbackInput').value='';
-      };
-      setStatus('Text mode — mic unsupported');
+    if(!r.ok) throw new Error('TTS proxy failed');
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    audioEl.src = url;
+    await audioEl.play().catch(()=>{});
+    setTimeout(()=>URL.revokeObjectURL(url), 12000);
+  }catch(e){
+    if('speechSynthesis' in window){
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate=.95; u.pitch=1.05;
+      window.speechSynthesis.speak(u);
     }
+  }
+}
 
-    /* ---------- Audio analyser drives charge ---------- */
-    ;(function audioReactive(){
-      try{
-        const ctx = new (window.AudioContext||window.webkitAudioContext)();
-        const src = ctx.createMediaElementSource(audioEl);
-        const analyser = ctx.createAnalyser(); analyser.fftSize = 256;
-        src.connect(analyser); analyser.connect(ctx.destination);
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        function loop(){
-          analyser.getByteFrequencyData(data);
-          let sum=0; for(let i=0;i<data.length;i++) sum+=data[i];
-          const avg = sum/data.length/255;
-          document.documentElement.style.setProperty('--charge', (avg*1.25).toFixed(3));
-          requestAnimationFrame(loop);
-        }
-        audioEl.addEventListener('play', ()=>{ if(ctx.state==='suspended') ctx.resume(); loop(); }, {once:true});
-      }catch(e){}
-    })();
+/* Simple somatic brain */
+function replyFor(input){
+  const s = (input||'').toLowerCase();
+  const M = {
+    anxious: "I feel your system running fast. Press your feet into the floor for two breaths. Notice if the current drops even 5%.",
+    tight:   "Let the tight place move one millimeter, then another. You don’t have to open — just allow a ripple.",
+    chest:   "Soften the sternum one grain of rice. Let your breath fill the back of your ribs.",
+    heart:   "Let the heart be held by the spine. Imagine hammock strings behind the chest.",
+    relax:   "Clench both hands for two seconds… and melt them open. That difference is what we’ll train.",
+    safe:    "Look around and name three colors you see. Your midbrain records safety through evidence.",
+    fear:    "Beautiful. Fear is wisdom at the door. We’ll move slow. Breathe low into the belly, like pouring sand.",
+  };
+  for(const k of Object.keys(M)){ if(s.includes(k)) return M[k]; }
+  return "Tell me where the strongest sensation lives — front/back, left/right, surface/deep. Give it three words for texture.";
+}
 
-    /* ---------- Neuron canvas background ---------- */
-    ;(function neuronField(){
-      const c = document.getElementById('neuroCanvas'); const x = c.getContext('2d');
-      let W,H,DPR = Math.min(2, devicePixelRatio||1);
-      function size(){ W=innerWidth; H=innerHeight; c.width=W*DPR; c.height=H*DPR; c.style.width=W+'px'; c.style.height=H+'px'; x.setTransform(DPR,0,0,DPR,0,0); }
-      size(); addEventListener('resize', size);
+function greet(){
+  hasGreeted = true;
+  setCaption("Hi. I'm here. Describe what your body feels — or press and speak.");
+  veraSpeak("Hi. I'm here. Tell me what your body is feeling right now.");
+}
 
-      const N = Math.min(190, Math.floor((W*H)/12000));
-      const pts = Array.from({length:N}, ()=>spawn());
-      let mx=-9999,my=-9999; addEventListener('mousemove', e=>{mx=e.clientX; my=e.clientY});
-      function spawn(){ const s=.2+Math.random()*.8; return {x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*s,vy:(Math.random()-.5)*s,r:1+Math.random()*2}; }
-      function step(p){
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.x<-50||p.x>W+50||p.y<-50||p.y>H+50){ Object.assign(p, spawn()); }
-        const dx=p.x-mx, dy=p.y-my, d2=dx*dx+dy*dy; if(d2<16000){ p.vx+=dx*-0.00003; p.vy+=dy*-0.00003; }
-      }
-      function draw(){
-        const g = x.createLinearGradient(0,0,W,H);
-        g.addColorStop(0,'rgba(177,156,217,.08)'); g.addColorStop(1,'rgba(100,181,246,.06)');
-        x.clearRect(0,0,W,H); x.fillStyle=g; x.fillRect(0,0,W,H);
+/* Guide chips */
+function guide(kind){
+  let text="";
+  if(kind==='breath'){
+    text="Let’s breathe together. Inhale softly for four… hold for four… exhale for six. We’ll repeat three times. Feel your rib cage widen in the back.";
+  }else if(kind==='sway'){
+    text="Stand or sit and let your spine sway like kelp in warm water. Tiny waves. No forcing, just allowing.";
+  }else{
+    text="We’ll ground now. Name five things you see. Four you can touch. Three you hear. Two you smell. One you taste. I’m here with you.";
+  }
+  setCaption(text);
+  veraSpeak(text);
+}
 
-        const charge=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--charge'))||0;
-        const L=120+charge*120;
+/* Mic recognition (Chrome/Edge). Fallback shows typing row. */
+function initRecognizer(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ typeRow.style.display='grid'; return null; }
+  const r = new SR();
+  r.lang = 'en-US'; r.continuous = false; r.interimResults = false; r.maxAlternatives = 1;
+  r.onstart = ()=>{ listening = true; pulseOn(true); setCaption("Listening… share what your body is feeling."); };
+  r.onend   = ()=>{ listening = false; pulseOn(false); };
+  r.onerror = ()=>{ listening = false; pulseOn(false); typeRow.style.display='grid'; setCaption("Mic unavailable. You can type below."); };
+  r.onresult= (e)=>{
+    const text = e.results[0][0].transcript || "";
+    if(text.trim().length) processInput(text);
+  };
+  return r;
+}
+recognizer = initRecognizer();
 
-        for(let i=0;i<N;i++){
-          const a=pts[i]; step(a);
-          for(let j=i+1;j<N;j++){
-            const b=pts[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
-            if(d<L){ const o=(1-d/L)*(0.35+charge*0.5); x.strokeStyle=`rgba(155,89,182,${o*.7})`; x.beginPath(); x.moveTo(a.x,a.y); x.lineTo(b.x,b.y); x.stroke(); }
-          }
-        }
-        for(const p of pts){
-          x.beginPath(); x.arc(p.x,p.y,p.r+charge*1.2,0,Math.PI*2);
-          x.fillStyle=`rgba(100,181,246,${.35+charge*.5})`; x.fill();
-        }
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
+/* Main orb click */
+orbBtn.addEventListener('click', ()=>{
+  if(!hasGreeted){ greet(); return; }
+  if(recognizer && !listening){
+    try{ recognizer.start(); }catch{}
+  }else{
+    typeRow.style.display='grid';
+    typeBox.focus();
+  }
+});
 
-    /* ---------- Guides ---------- */
-    async function guideBreath(){
-      const seq = [
-        "Let’s breathe together.",
-        "Inhale slowly for four… one… two… three… four.",
-        "Hold for four… one… two… three… four.",
-        "Exhale for six… one… two… three… four… five… six.",
-        "Beautiful."
-      ];
-      for(const line of seq){ await speak(line); await new Promise(r=>setTimeout(r,150)); }
-    }
+/* Typed fallback */
+function typed(){
+  const v = typeBox.value.trim();
+  if(!v) return;
+  typeBox.value="";
+  processInput(v);
+}
 
-    /* ---------- Kickoff note ---------- */
-    window.addEventListener('load', ()=>{
-      setStatus('Idle — tap to begin');
-      if(!speechOK){ fallbackPrompt(); }
-    });
-  </script>
+/* Process, speak, animate */
+function processInput(text){
+  const r = replyFor(text);
+  setCaption(r + "  (You said: “" + text + "”.)");
+  orb.style.animation = 'none'; // bump
+  // quick “breath” bump
+  setTimeout(()=>{ orb.style.animation='floaty 7s ease-in-out infinite'; }, 50);
+  veraSpeak(r);
+}
+
+/* Audio pulses toggle mic pulse only while speaking */
+audioEl.addEventListener('play', ()=>pulseOn(true));
+audioEl.addEventListener('ended', ()=>{ if(!listening) pulseOn(false); });
+
+/* Initial hint */
+setCaption("Tap the orb to begin. You can talk or type (mic permitting).");
+</script>
 </body>
 </html>
