@@ -1,30 +1,48 @@
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const { messages } = req.body || {};
-    if (!Array.isArray(messages)) return res.status(400).json({ error: 'messages[] required' });
-
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+    const { history } = req.body || {};
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY missing' });
+    if (!apiKey) {
+      return res.status(500).json({ error: "OPENAI_API_KEY not set" });
+    }
 
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    const system = {
+      role: "system",
+      content:
+        "You are VERA, a warm, somatic nervous-system guide. You respond in short, grounded sentences, embodying safety. Avoid generic therapy clichés. Offer one simple bodily cue at a time (micro-movements, breath pacing, orientation cues). Ask a gentle follow-up question to deepen interoception. Keep answers under 120 words."
+    };
+
+    // sanitize user-provided history
+    const msgs = Array.isArray(history) ? history : [];
+    const messages = [system, ...msgs.map(m => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: String(m.content || "").slice(0, 2000)
+    }))];
+
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0.7,
-        max_tokens: 220,
-        messages
+        model: "gpt-4o-mini",
+        messages,
+        temperature: 0.7
       })
     });
+
     if (!r.ok) {
-      const txt = await r.text().catch(() => '');
-      return res.status(r.status).json({ error: 'OpenAI error', detail: txt });
+      const detail = await r.text().catch(()=> "");
+      return res.status(r.status).json({ error: "Chat failed", detail });
     }
     const data = await r.json();
-    const text = data?.choices?.[0]?.message?.content?.trim() || "I'm here with you.";
-    res.status(200).json({ text });
+    const reply = data?.choices?.[0]?.message?.content || "I’m here with you.";
+    return res.status(200).json({ reply });
   } catch (e) {
-    res.status(500).json({ error: 'Server error', detail: e?.message || String(e) });
+    return res.status(500).json({ error: "Server error", detail: e?.message || String(e) });
   }
 }
