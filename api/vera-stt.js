@@ -1,38 +1,39 @@
-export const config = { api: { bodyParser: { sizeLimit: '15mb' } } };
-
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
     const { audio, mime } = req.body || {};
-    if (!audio) return res.status(400).json({ error: 'audio base64 required' });
-
+    if (!audio) {
+      return res.status(400).json({ error: "Missing base64 audio" });
+    }
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY missing' });
+    if (!apiKey) {
+      return res.status(500).json({ error: "OPENAI_API_KEY not set" });
+    }
 
-    const base64 = audio.includes(',') ? audio.split(',')[1] : audio;
-    const buf = Buffer.from(base64, 'base64');
-    const filename = 'input.webm';
-    const type = mime || 'audio/webm';
-
+    // decode base64 → Buffer → Blob → FormData
+    const buffer = Buffer.from(audio, "base64");
+    const blob = new Blob([buffer], { type: mime || "audio/webm" });
     const form = new FormData();
-    form.append('file', new Blob([buf], { type }), filename);
-    form.append('model', 'whisper-1');
-    form.append('temperature', '0');
-    form.append('response_format', 'json');
+    form.append("file", blob, "input.webm");
+    form.append("model", "whisper-1"); // OpenAI Whisper model
+    // Optional: form.append("temperature", "0");
+    // Optional: form.append("language", "en");
 
-    const r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}` },
+    const r = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}` },
       body: form
     });
-
     if (!r.ok) {
-      const txt = await r.text().catch(()=> '');
-      return res.status(r.status).json({ error: 'Whisper error', detail: txt });
+      const detail = await r.text().catch(()=> "");
+      return res.status(r.status).json({ error: "STT failed", detail });
     }
     const data = await r.json();
-    return res.status(200).json({ text: (data.text || '').trim() });
+    const text = data?.text || "";
+    return res.status(200).json({ text });
   } catch (e) {
-    return res.status(500).json({ error: 'Server error', detail: e?.message || String(e) });
+    return res.status(500).json({ error: "Server error", detail: e?.message || String(e) });
   }
 }
