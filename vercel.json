@@ -1,14 +1,16 @@
 {
-  "functions": { "api/*.js": { "runtime": "nodejs18.x", "memory": 256 } },
+  "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-      ]
+
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 15
     }
+  },
+
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" }
   ]
 }
