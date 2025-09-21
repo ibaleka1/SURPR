@@ -15,7 +15,6 @@ export default async function handler(req, res) {
         "You are VERA, a warm, somatic nervous-system guide. You respond in short, grounded sentences, embodying safety. Avoid generic therapy clichés. Offer one simple bodily cue at a time (micro-movements, breath pacing, orientation cues). Ask a gentle follow-up question to deepen interoception. Keep answers under 120 words."
     };
 
-    // sanitize user-provided history
     const msgs = Array.isArray(history) ? history : [];
     const messages = [system, ...msgs.map(m => ({
       role: m.role === "assistant" ? "assistant" : "user",
