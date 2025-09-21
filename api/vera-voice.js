@@ -1,33 +1,86 @@
-export default async function handler(req, res) {
-  try {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+export const config = { runtime: "edge" }; // works great on Vercel
 
-    const { text } = req.body || {};
-    if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
+export default async function handler(req) {
+  try {
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        status: 405,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
+    const { text, voiceId: overrideVoiceId, stylePreset } = await req.json().catch(() => ({}));
+    if (!text || typeof text !== "string") {
+      return new Response(JSON.stringify({ error: 'Missing "text" string in body.' }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
+    }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
-    const voiceId = process.env.ELEVENLABS_VOICE_ID;
-    if (!apiKey || !voiceId) return res.status(500).json({ error: 'Missing ElevenLabs envs' });
+    // IMPORTANT: set this to a clearly American voice in Vercel env:
+    // ELEVENLABS_VOICE_ID = <a US-accent voice ID>
+    const envVoiceId = process.env.ELEVENLABS_VOICE_ID;
+    const voiceId = overrideVoiceId || envVoiceId;
 
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
+    if (!apiKey || !voiceId) {
+      return new Response(JSON.stringify({ error: "Voice or API key not configured." }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
+    // Whispery / soft defaults (tunable)
+    // Accent is controlled by the actual voiceId. Pick a US voice in your ElevenLabs dashboard.
+    const whispery = {
+      stability: 0.2,          // breathier, more natural variation
+      similarity_boost: 0.9,   // cling closer to that voice’s timbre
+      style: 0.85,             // more expressive/whispery
+      use_speaker_boost: false // avoid the crisp "news anchor" effect
+    };
+
+    const chosen = (stylePreset === "default")
+      ? { stability: 0.5, similarity_boost: 0.7, style: 0.2, use_speaker_boost: true }
+      : whispery;
+
+    const ttsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+    const r = await fetch(ttsUrl, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "content-type": "application/json",
+        "accept": "audio/mpeg"
+      },
       body: JSON.stringify({
         text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true }
+        model_id: "eleven_multilingual_v2",
+        voice_settings: chosen,
+        // You can also return higher quality:
+        // output_format: "mp3_44100_96"
       })
     });
+
     if (!r.ok) {
-      const err = await r.text().catch(()=> '');
-      return res.status(r.status).json({ error: 'TTS request failed', detail: err });
+      const detail = await r.text().catch(() => "");
+      return new Response(JSON.stringify({ error: "TTS request failed", detail }), {
+        status: r.status,
+        headers: { "content-type": "application/json" }
+      });
     }
-    const buf = Buffer.from(await r.arrayBuffer());
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).send(buf);
+
+    const audio = await r.arrayBuffer();
+    return new Response(audio, {
+      status: 200,
+      headers: {
+        "content-type": "audio/mpeg",
+        "cache-control": "no-store",
+        "x-voice-id": voiceId
+      }
+    });
   } catch (e) {
-    return res.status(500).json({ error: 'Server error', detail: e?.message || String(e) });
+    return new Response(JSON.stringify({ error: "Server error", detail: e?.message || String(e) }), {
+      status: 500,
+      headers: { "content-type": "application/json" }
+    });
   }
 }
