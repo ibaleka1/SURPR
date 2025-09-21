@@ -1,54 +1,349 @@
-// Serverless ElevenLabs TTS proxy (CommonJS for maximum compatibility)
-module.exports = async (req, res) => {
-  // CORS + preflight (safe for local & prod)
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VERA — Your Nervous System Is Finally Speaking</title>
+<meta name="description" content="VERA: real-time somatic coaching, voice-guided protocols, and a companion that speaks the language of your fascia." />
 
-  // Parse robustly (Vercel sometimes bypasses body parsers)
-  let body = req.body;
-  if (!body || typeof body !== 'object') {
-    let raw = ''; for await (const c of req) raw += c;
-    try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
-  }
-  const text = (body && body.text) || '';
-  if (!text || typeof text !== 'string') {
-    return res.status(400).json({ error: 'Missing "text" string in body.' });
-  }
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-  const voiceId = process.env.ELEVENLABS_VOICE_ID;
-  if (!apiKey || !voiceId) {
-    return res.status(500).json({ error: 'Voice or API key not configured.' });
-  }
+<style>
+:root{
+  --bg-0:#0b1027; --bg-1:#0a0e27; --bg-2:#060817;
+  --text:#eaf0ff; --text-dim:#cbd5ff; --muted:#9aa4c7;
+  --card:rgba(255,255,255,.04); --card-b:rgba(255,255,255,.08);
+  --accent-1:#9b86f7; --accent-2:#66b8f5; --gold:#ffd97a;
+  --ring1:rgba(155, 89, 182, .35); --ring2:rgba(100, 181, 246, .30);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:"Plus Jakarta Sans", Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 60% -10%, rgba(100,181,246,0.10), transparent 60%),
+    radial-gradient(900px 500px at 30% 100%, rgba(155,89,182,0.10), transparent 60%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+}
 
-  try {
-    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg'
-      },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.5, similarity_boost: 0.7, style: 0.2, use_speaker_boost: true }
-      })
+/* NAV */
+nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px;
+  background:linear-gradient(180deg, rgba(10,14,39,.85), rgba(10,14,39,.55));
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.brand{ letter-spacing:.38em; font-weight:600; color:#cfe3ff }
+.nav-links a{ color:var(--text-dim); text-decoration:none; margin:0 12px; font-weight:500 }
+.nav-cta{
+  padding:.7rem 1.15rem; border-radius:999px; border:0; color:white; cursor:pointer;
+  background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  box-shadow:0 10px 30px rgba(120,150,255,.25);
+}
+
+/* HERO */
+.hero{ padding:80px 20px 40px; text-align:center }
+.hero h1{
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  font-weight:300; line-height:1.08; letter-spacing:.02em;
+  margin:10px auto 16px;
+  max-width:1200px;
+  background:linear-gradient(135deg,#eef2ff 0%,#cfe1ff 30%,#b7d6ff 55%,#c7b7ff 75%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.hero p{ color:var(--text-dim); max-width:900px; margin:0 auto 18px; }
+
+/* PLANS */
+.plans{ max-width:1200px; margin:30px auto 10px; padding:0 16px; display:grid; gap:18px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.card{
+  background:var(--card); border:1px solid var(--card-b); border-radius:22px; padding:24px;
+  box-shadow:0 16px 48px rgba(0,0,0,.45); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{ transform:translateY(-6px); box-shadow:0 28px 70px rgba(130,150,255,.2); border-color:rgba(170,160,255,.35) }
+.card h3{ margin:6px 0 2px; font-weight:700; letter-spacing:.09em; color:#dfe6ff }
+.card small{ color:var(--muted) }
+.price{ font-size:2.2rem; margin:14px 0 6px; }
+.btn{
+  width:100%; margin-top:12px; padding:.8rem 1rem; border-radius:999px; border:0; color:white; cursor:pointer;
+  background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+}
+
+/* EXPERIENCE / CHAT */
+.section{ max-width:1200px; margin:60px auto; padding:0 16px; }
+.grid-2{ display:grid; grid-template-columns: 1.1fr .9fr; gap:22px; align-items:start }
+.panel{ background:var(--card); border:1px solid var(--card-b); border-radius:28px; padding:22px; box-shadow:0 16px 50px rgba(0,0,0,.45) }
+
+.quick{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
+.chip{
+  border-radius:999px; padding:.55rem .9rem; border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04); color:var(--text-dim); cursor:pointer; font-size:.95rem;
+}
+.chip:hover{ background:rgba(255,255,255,.1); color:white; border-color:rgba(255,255,255,.18) }
+
+.messages{
+  height:360px; overflow:auto; padding:14px;
+  background:
+    radial-gradient(380px 200px at 18% 30%, var(--ring1), transparent 60%),
+    radial-gradient(360px 220px at 85% 80%, var(--ring2), transparent 60%),
+    rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.06); border-radius:18px;
+}
+.msg{ margin-bottom:14px; display:flex }
+.msg .bubble{
+  max-width:80%; padding:.95rem 1.1rem; border-radius:14px; line-height:1.5; font-weight:500
+}
+.msg.user{ justify-content:flex-end }
+.msg.user .bubble{
+  background:linear-gradient(135deg, rgba(130,185,255,.25), rgba(120,160,255,.22));
+  border:1px solid rgba(150,180,255,.35)
+}
+.msg.vera .bubble{
+  background:linear-gradient(135deg, rgba(160,120,255,.25), rgba(110,200,255,.18));
+  border:1px solid rgba(170,150,255,.35)
+}
+
+.input-row{ display:flex; gap:10px; align-items:center; margin-top:12px }
+#chatInput{
+  flex:1; padding:1rem 1.2rem; border-radius:999px; border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06); color:white; outline:none; font-size:1rem;
+}
+#chatInput::placeholder{ color:rgba(235,240,255,.45) }
+.icon-btn{
+  width:46px; height:46px; display:inline-grid; place-items:center; border-radius:999px; border:0; cursor:pointer;
+  background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); color:white;
+}
+.send-btn{ padding:.9rem 1.2rem; border-radius:999px; border:0; background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); color:white; cursor:pointer }
+
+/* PRACTICES */
+.practice{ display:flex; flex-direction:column; gap:12px }
+.pcard{ padding:16px; border-radius:16px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1) }
+.pcard h4{ margin:0 0 6px }
+.pcard .mini{ color:var(--text-dim) }
+.pcard .guide{ margin-top:8px; padding:.45rem .8rem; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:transparent; color:var(--text); cursor:pointer }
+
+/* PORTALS (single-page anchors instead of separate files) */
+.portals{ max-width:1200px; margin:60px auto; padding:0 16px; display:grid; gap:18px; grid-template-columns: repeat(4,minmax(0,1fr)) }
+.portal{ background:var(--card); border:1px solid var(--card-b); border-radius:22px; padding:20px }
+.portal h3{ margin:0 0 10px }
+.portal p{ margin:0 0 12px; color:var(--text-dim) }
+.portal a{ display:inline-block; text-decoration:none; color:white; background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); padding:.6rem .9rem; border-radius:999px }
+
+/* FOOTER */
+footer{ border-top:1px solid rgba(255,255,255,.06); padding:28px 16px; text-align:center; color:var(--muted) }
+
+/* Mobile */
+@media (max-width: 980px){
+  .plans{ grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .grid-2{ grid-template-columns: 1fr; }
+  .portals{ grid-template-columns: repeat(2,minmax(0,1fr)) }
+}
+@media (max-width: 560px){
+  .plans, .portals{ grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">V&nbsp;E&nbsp;R&nbsp;A</div>
+  <div class="nav-links">
+    <a href="#portals">Portals</a>
+    <a href="#experience">Experience VERA</a>
+    <a href="#about">About</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})">Try Now</button>
+</nav>
+
+<section class="hero">
+  <h1>Your Nervous System<br/>Is Finally Speaking</h1>
+  <p>Real-time somatic coaching, voice-guided protocols, and a companion that speaks the language of your fascia. Breathe. We listen.</p>
+</section>
+
+<section class="plans" id="plans">
+  <div class="card">
+    <small>EXPLORER</small>
+    <h3>Gentle daily check-ins</h3>
+    <div class="price">$19<span style="font-size:.9rem">/mo</span></div>
+    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Start Exploring</button>
+  </div>
+  <div class="card">
+    <small>REGULATOR</small>
+    <h3>Advanced regulation</h3>
+    <div class="price">$39<span style="font-size:.9rem">/mo</span></div>
+    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Get Regulated</button>
+  </div>
+  <div class="card">
+    <small>INTEGRATOR</small>
+    <h3>Custom protocols</h3>
+    <div class="price">$79<span style="font-size:.9rem">/mo</span></div>
+    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Full Integration</button>
+  </div>
+  <div class="card" style="border-color:rgba(255,215,0,.35)">
+    <small style="color:var(--gold)">ENTERPRISE</small>
+    <h3>Organizations & teams</h3>
+    <div class="price">Custom</div>
+    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Contact Sales</button>
+  </div>
+</section>
+
+<section class="section grid-2" id="experience">
+  <!-- Chat panel -->
+  <div class="panel">
+    <h3 style="margin:6px 0 12px">Speak with VERA</h3>
+    <div class="quick">
+      <button class="chip" onclick="quick('I feel tight in my chest')">I feel tight in my chest</button>
+      <button class="chip" onclick="quick('My body feels anxious')">My body feels anxious</button>
+      <button class="chip" onclick="quick(`I can't relax`)">I can't relax</button>
+      <button class="chip" onclick="quick('Help me feel safe')">Help me feel safe</button>
+    </div>
+
+    <div id="messages" class="messages" aria-live="polite"></div>
+
+    <div class="input-row">
+      <input id="chatInput" placeholder="Tell VERA what your body is saying…" autocomplete="off" />
+      <button class="icon-btn" id="voiceBtn" title="Toggle voice" onclick="voiceActive=!voiceActive; this.style.opacity=voiceActive?1:.7">🎤</button>
+      <button class="send-btn" onclick="send()">Send</button>
+    </div>
+    <div style="margin-top:6px; font-size:.9rem; color:var(--muted)">Voice uses your ElevenLabs voice via <code>/api/vera-voice</code>.</div>
+    <audio id="veraAudio" preload="auto"></audio>
+  </div>
+
+  <!-- Practices -->
+  <div class="panel">
+    <h3 style="margin:6px 0 12px">Somatic micro-practices</h3>
+    <div class="practice">
+      <div class="pcard">
+        <h4>Square Breath</h4>
+        <div class="mini">Inhale 4 • Hold 4 • Exhale 4 • Hold 4 — repeat 4x.</div>
+        <button class="guide" onclick="speak(`Let’s breathe together. Inhale for four—one, two, three, four. Hold for four—one, two, three, four. Exhale for four. Hold for four. Beautiful. Repeat.`)">Guide me</button>
+      </div>
+      <div class="pcard">
+        <h4>Kelp Sway</h4>
+        <div class="mini">Stand or sit and let your spine sway like kelp in warm water. No forcing—just allowing.</div>
+        <button class="guide" onclick="speak(`Let your body sway gently, like kelp in warm water. Your spine knows how to move. Trust it. You are safe.`)">Guide me</button>
+      </div>
+      <div class="pcard">
+        <h4>5-4-3-2-1 Ground</h4>
+        <div class="mini">5 see • 4 touch • 3 hear • 2 smell • 1 taste.</div>
+        <button class="guide" onclick="speak(`Notice five things you can see, four you can touch, three you can hear, two you can smell, and one you can taste. You’re here. You’re safe.`)">Guide me</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Single-page “portals” showcase -->
+<section class="portals" id="portals">
+  <div class="portal" id="portal-explorer">
+    <h3>Explorer</h3><p>Gentle daily check-ins, three guided practices.</p>
+    <a href="#experience">Open</a>
+  </div>
+  <div class="portal" id="portal-regulator">
+    <h3>Regulator</h3><p>Unlimited conversations, advanced protocols.</p>
+    <a href="#experience">Open</a>
+  </div>
+  <div class="portal" id="portal-integrator">
+    <h3>Integrator</h3><p>Custom maps & personal plans.</p>
+    <a href="#experience">Open</a>
+  </div>
+  <div class="portal" id="portal-enterprise">
+    <h3>Enterprise</h3><p>Org-wide deployment & analytics.</p>
+    <a href="#experience">Open</a>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="panel" style="text-align:center">
+    <h3>About VERA</h3>
+    <p style="color:var(--text-dim);max-width:800px;margin:10px auto 0">
+      VERA listens to the language of your fascia, reflects sensation precisely, and guides micro-movements that create macro shifts.
+    </p>
+  </div>
+</section>
+
+<footer>© 2025 VERA Technologies — Where your nervous system remembers safety</footer>
+
+<script>
+/* -------- robust UI (typing guaranteed) -------- */
+const messages = document.getElementById('messages');
+const input = document.getElementById('chatInput');
+const audioEl = document.getElementById('veraAudio');
+let voiceActive = true;
+
+function addMsg(who, text){
+  const row = document.createElement('div'); row.className = 'msg '+who;
+  const b = document.createElement('div'); b.className='bubble'; b.textContent=text;
+  row.appendChild(b); messages.appendChild(row);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function intro(){
+  addMsg('vera','“I’m here. What sensation is most alive right now? Where does it live in your body?”');
+}
+intro();
+
+function quick(t){ input.value=t; send(); }
+input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); send(); } });
+
+function send(){
+  const text = (input.value||'').trim();
+  if(!text) return;
+  addMsg('user', text);
+  input.value='';
+  const reply = respond(text);
+  setTimeout(()=>{ addMsg('vera', reply); if(voiceActive) speak(reply); }, 350);
+}
+
+function respond(user){
+  const u = user.toLowerCase();
+  const base = (() => {
+    if(u.includes('chest')) return "Your chest is speaking—heart armor. Breathe into the edges and let your sternum float 1%.";
+    if(u.includes('tight')) return "I feel that tightness with you. Thank the protection and invite a 1-millimeter softening.";
+    if(u.includes('anx')||u.includes('panic')) return "Your system is protecting you. Press your feet down gently for two breaths—you’re here.";
+    if(u.includes('relax')) return "Try a micro-release: clench for two seconds, then melt open. Feel the difference.";
+    if(u.includes('safe')) return "Safety is a felt sense. Name five things you see, four to touch, three you hear… I’m with you.";
+    return "I hear you. Tell me: is the sensation sharp or dull, hot or cool, moving or still?";
+  })();
+  const follow = " Where exactly is it—front/back, left/right, surface/deep? Give me three words for its texture.";
+  return base + follow;
+}
+
+/* -------- ElevenLabs voice (with graceful fallback) -------- */
+async function speak(text){
+  try{
+    const r = await fetch('/api/vera-voice', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text })
     });
-
-    if (!r.ok) {
-      const detail = await r.text().catch(()=> '');
-      return res.status(r.status).json({ error: 'TTS request failed', detail });
+    const ct = r.headers.get('content-type')||'';
+    if(!r.ok || ct.includes('application/json')){
+      const err = await r.json().catch(()=>({}));
+      console.warn('TTS error', err);
+      return fallbackSpeak(text);
     }
-
-    const buf = Buffer.from(await r.arrayBuffer());
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).send(buf);
-  } catch (e) {
-    return res.status(500).json({ error: 'Server error', detail: e?.message || String(e) });
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    audioEl.src = url;
+    await audioEl.play().catch(()=>{});
+    audioEl.onended = () => URL.revokeObjectURL(url);
+  }catch(e){
+    console.warn('TTS fetch failed', e);
+    fallbackSpeak(text);
   }
-};
+}
+function fallbackSpeak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text); u.rate=.95; u.pitch=1.05;
+  speechSynthesis.speak(u);
+}
+</script>
+</body>
+</html>
