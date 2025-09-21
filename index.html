@@ -1,349 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>VERA — Your Nervous System Is Finally Speaking</title>
-<meta name="description" content="VERA: real-time somatic coaching, voice-guided protocols, and a companion that speaks the language of your fascia." />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VERA — Nervous System Intelligence</title>
+  <meta name="description" content="VERA: voice-guided somatic intelligence. A living, responsive interface with real-time nervous system support." />
 
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="VERA — Nervous System Intelligence" />
+  <meta property="og:description" content="Voice-guided somatic intelligence with real-time regulation." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-<style>
-:root{
-  --bg-0:#0b1027; --bg-1:#0a0e27; --bg-2:#060817;
-  --text:#eaf0ff; --text-dim:#cbd5ff; --muted:#9aa4c7;
-  --card:rgba(255,255,255,.04); --card-b:rgba(255,255,255,.08);
-  --accent-1:#9b86f7; --accent-2:#66b8f5; --gold:#ffd97a;
-  --ring1:rgba(155, 89, 182, .35); --ring2:rgba(100, 181, 246, .30);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:"Plus Jakarta Sans", Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(1200px 600px at 60% -10%, rgba(100,181,246,0.10), transparent 60%),
-    radial-gradient(900px 500px at 30% 100%, rgba(155,89,182,0.10), transparent 60%),
-    linear-gradient(180deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
-}
+  <!-- Fonts (safe fallbacks in CSS if blocked) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 
-/* NAV */
-nav{
-  position:sticky; top:0; z-index:50;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 20px;
-  background:linear-gradient(180deg, rgba(10,14,39,.85), rgba(10,14,39,.55));
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.brand{ letter-spacing:.38em; font-weight:600; color:#cfe3ff }
-.nav-links a{ color:var(--text-dim); text-decoration:none; margin:0 12px; font-weight:500 }
-.nav-cta{
-  padding:.7rem 1.15rem; border-radius:999px; border:0; color:white; cursor:pointer;
-  background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  box-shadow:0 10px 30px rgba(120,150,255,.25);
-}
+  <style>
+    :root{
+      --bg-0:#060814; --bg-1:#0a0f22; --bg-2:#0e1633;
+      --ink-1:rgba(255,255,255,.92); --ink-2:rgba(255,255,255,.7); --ink-3:rgba(255,255,255,.45);
+      --lav:#B19CD9; --vio:#9B59B6; --sky:#64B5F6; --mint:#10B981; --gold:#FFD700; --pink:#F8BBD0;
+      --glass:rgba(255,255,255,.06); --glass-b:rgba(255,255,255,.14);
+      --charge:0; /* animated by audio analyser (0..1) */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:radial-gradient(1200px 800px at 20% -10%, #202a55 0%, #0d1331 35%, #050714 70%, #01030a 100%);
+      color:var(--ink-1); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Plus Jakarta Sans", sans-serif;
+      overflow-x:hidden;
+    }
+    /* Global elements */
+    .banner{
+      position:fixed; inset:0 auto auto 0; width:100%; padding:.6rem 1rem; text-align:center; z-index:9999;
+      background:linear-gradient(90deg, #FFD700, #FF9A3D); color:#151515; font-weight:700; letter-spacing:.02em;
+      box-shadow:0 4px 20px rgba(0,0,0,.35);
+    }
+    nav{
+      position:fixed; top:44px; left:0; right:0; z-index:9998;
+      display:flex; align-items:center; justify-content:space-between; gap:1rem;
+      padding:1rem 2rem; border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(6,8,20,.85), rgba(6,8,20,.55));
+      backdrop-filter:saturate(150%) blur(16px);
+    }
+    .brand{
+      font-weight:800; letter-spacing:.28em; font-size:1.4rem; cursor:pointer;
+      background:linear-gradient(120deg, var(--gold), var(--lav), var(--sky)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .menu{display:flex; gap:1.2rem; align-items:center}
+    .menu a{color:var(--ink-2); text-decoration:none; font-weight:600}
+    .menu a:hover{color:#fff}
+    .cta{border:none; padding:.8rem 1.2rem; border-radius:999px; cursor:pointer; font-weight:700;
+      background:linear-gradient(135deg, var(--lav), var(--sky));
+      color:#fff; box-shadow:0 12px 40px rgba(100,181,246,.25);
+    }
+    .cta:hover{transform:translateY(-1px)}
 
-/* HERO */
-.hero{ padding:80px 20px 40px; text-align:center }
-.hero h1{
-  font-size: clamp(2.6rem, 5vw, 4.6rem);
-  font-weight:300; line-height:1.08; letter-spacing:.02em;
-  margin:10px auto 16px;
-  max-width:1200px;
-  background:linear-gradient(135deg,#eef2ff 0%,#cfe1ff 30%,#b7d6ff 55%,#c7b7ff 75%);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-}
-.hero p{ color:var(--text-dim); max-width:900px; margin:0 auto 18px; }
+    /* Canvas background (neurons & fascia) */
+    #neuroCanvas{position:fixed; inset:0; z-index:0}
+    .glow{
+      pointer-events:none; position:fixed; inset:0; z-index:0;
+      background:
+        radial-gradient(800px 600px at 80% 10%, rgba(155,89,182,.18), transparent 60%),
+        radial-gradient(900px 900px at 20% 80%, rgba(100,181,246,.16), transparent 70%),
+        radial-gradient(600px 600px at 60% 60%, rgba(16,185,129,.13), transparent 70%);
+      filter:saturate(calc(1 + var(--charge) * .6)) brightness(calc(1 + var(--charge) * .4));
+      transition:filter .25s ease;
+    }
 
-/* PLANS */
-.plans{ max-width:1200px; margin:30px auto 10px; padding:0 16px; display:grid; gap:18px;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-}
-.card{
-  background:var(--card); border:1px solid var(--card-b); border-radius:22px; padding:24px;
-  box-shadow:0 16px 48px rgba(0,0,0,.45); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.card:hover{ transform:translateY(-6px); box-shadow:0 28px 70px rgba(130,150,255,.2); border-color:rgba(170,160,255,.35) }
-.card h3{ margin:6px 0 2px; font-weight:700; letter-spacing:.09em; color:#dfe6ff }
-.card small{ color:var(--muted) }
-.price{ font-size:2.2rem; margin:14px 0 6px; }
-.btn{
-  width:100%; margin-top:12px; padding:.8rem 1rem; border-radius:999px; border:0; color:white; cursor:pointer;
-  background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
-}
+    /* Hero */
+    .hero{
+      position:relative; z-index:1; padding-top:160px; padding-bottom:64px;
+      min-height:92vh; display:grid; place-items:center;
+    }
+    .hero-inner{max-width:1100px; margin:auto; text-align:center; padding:0 1.2rem}
+    .headline{
+      font-weight:800; font-size:clamp(2.4rem, 6vw, 5rem); line-height:1.03; letter-spacing:.01em; margin:0 0 .8rem;
+      background:conic-gradient(from 30deg at 50% 50%, #fff, var(--lav), var(--sky), #fff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-shadow:0 0 60px rgba(155,89,182,.25);
+    }
+    .sub{
+      color:var(--ink-2); font-size:clamp(1.05rem, 2.2vw, 1.35rem); line-height:1.7; margin-bottom:1.6rem
+    }
+    .hero-actions{display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap}
+    .ghost{
+      background:transparent; border:1px solid var(--glass-b); color:#fff; padding:.8rem 1.2rem; border-radius:999px; font-weight:700; cursor:pointer
+    }
+    .note{color:var(--ink-3); font-size:.9rem}
 
-/* EXPERIENCE / CHAT */
-.section{ max-width:1200px; margin:60px auto; padding:0 16px; }
-.grid-2{ display:grid; grid-template-columns: 1.1fr .9fr; gap:22px; align-items:start }
-.panel{ background:var(--card); border:1px solid var(--card-b); border-radius:28px; padding:22px; box-shadow:0 16px 50px rgba(0,0,0,.45) }
+    /* Portal grid (4 portals) */
+    .portals{
+      position:relative; z-index:1; padding:40px 1rem 10px; max-width:1220px; margin:0 auto;
+      display:grid; grid-template-columns:repeat(4, minmax(220px, 1fr)); gap:20px;
+    }
+    @media (max-width:1100px){.portals{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:600px){.portals{grid-template-columns:1fr}}
+    .portal{
+      position:relative; overflow:hidden; border-radius:22px; padding:22px;
+      background:linear-gradient(140deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.12); box-shadow:0 10px 45px rgba(0,0,0,.35);
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      min-height:190px; cursor:pointer
+    }
+    .portal:hover{transform:translateY(-6px); border-color:rgba(255,255,255,.28); box-shadow:0 20px 70px rgba(155,89,182,.20)}
+    .portal h3{margin:0 0 .3rem; font-size:1.1rem; letter-spacing:.12em; color:var(--ink-2)}
+    .portal .price{font-size:2rem; font-weight:800; margin:.2rem 0 .8rem}
+    .portal ul{margin:0; padding-left:1.1rem; color:var(--ink-2); line-height:1.7; font-size:.95rem}
+    .portal .chip{
+      position:absolute; top:14px; right:14px; font-size:.75rem; font-weight:800; letter-spacing:.12em;
+      padding:.35rem .6rem; border-radius:999px; color:#0b0b0b; background:linear-gradient(120deg, var(--gold), #ffb84d)
+    }
+    .portal .ink{position:absolute; inset:auto -20% -30% auto; width:220px; height:220px;
+      background:radial-gradient(circle at 30% 30%, rgba(177,156,217,.45), transparent 55%),
+                 radial-gradient(circle at 70% 50%, rgba(100,181,246,.35), transparent 60%),
+                 radial-gradient(circle at 40% 80%, rgba(248,187,208,.28), transparent 60%);
+      filter:blur(10px)
+    }
+    .portal.primary{background:linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.06))}
+    .portal .go{
+      margin-top:1rem; display:inline-flex; align-items:center; gap:.5rem; font-weight:800; letter-spacing:.08em;
+      border:1px solid rgba(255,255,255,.18); padding:.55rem .9rem; border-radius:12px; color:#fff; text-decoration:none
+    }
+    .portal .go:hover{border-color:rgba(255,255,255,.34)}
 
-.quick{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
-.chip{
-  border-radius:999px; padding:.55rem .9rem; border:1px solid rgba(255,255,255,.1);
-  background:rgba(255,255,255,.04); color:var(--text-dim); cursor:pointer; font-size:.95rem;
-}
-.chip:hover{ background:rgba(255,255,255,.1); color:white; border-color:rgba(255,255,255,.18) }
+    /* Dock chat */
+    .dock{
+      position:fixed; right:18px; bottom:18px; z-index:60; display:flex; flex-direction:column; gap:10px; align-items:end;
+    }
+    .dock .bubble{
+      border:none; border-radius:999px; width:56px; height:56px; display:grid; place-items:center; cursor:pointer; font-size:22px;
+      background:linear-gradient(135deg, var(--lav), var(--sky));
+      box-shadow:0 18px 50px rgba(100,181,246,.25)
+    }
+    .dock .panel{
+      width:min(92vw, 440px); height:520px; display:none; flex-direction:column; overflow:hidden;
+      border-radius:18px; background:linear-gradient(180deg, rgba(9,12,28,.96), rgba(9,12,28,.86));
+      border:1px solid rgba(255,255,255,.12); box-shadow:0 24px 80px rgba(0,0,0,.45)
+    }
+    .dock .panel.open{display:flex}
+    .panel header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08)}
+    .panel header .tag{
+      font-weight:800; letter-spacing:.16em; font-size:.8rem;
+      background:linear-gradient(120deg, var(--gold), var(--lav)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .feed{flex:1; overflow:auto; padding:12px}
+    .msg{max-width:82%; padding:10px 12px; border-radius:12px; margin:8px 0; line-height:1.45}
+    .me{margin-left:auto; background:rgba(100,181,246,.23); border:1px solid rgba(100,181,246,.28)}
+    .ai{background:rgba(177,156,217,.22); border:1px solid rgba(177,156,217,.28)}
+    .composer{display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,.08)}
+    .composer input{
+      flex:1; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.05); color:#fff
+    }
+    .composer button{border:none; border-radius:12px; padding:12px 14px; font-weight:800; cursor:pointer; background:linear-gradient(135deg, var(--lav), var(--sky)); color:#fff}
 
-.messages{
-  height:360px; overflow:auto; padding:14px;
-  background:
-    radial-gradient(380px 200px at 18% 30%, var(--ring1), transparent 60%),
-    radial-gradient(360px 220px at 85% 80%, var(--ring2), transparent 60%),
-    rgba(0,0,0,.35);
-  border:1px solid rgba(255,255,255,.06); border-radius:18px;
-}
-.msg{ margin-bottom:14px; display:flex }
-.msg .bubble{
-  max-width:80%; padding:.95rem 1.1rem; border-radius:14px; line-height:1.5; font-weight:500
-}
-.msg.user{ justify-content:flex-end }
-.msg.user .bubble{
-  background:linear-gradient(135deg, rgba(130,185,255,.25), rgba(120,160,255,.22));
-  border:1px solid rgba(150,180,255,.35)
-}
-.msg.vera .bubble{
-  background:linear-gradient(135deg, rgba(160,120,255,.25), rgba(110,200,255,.18));
-  border:1px solid rgba(170,150,255,.35)
-}
-
-.input-row{ display:flex; gap:10px; align-items:center; margin-top:12px }
-#chatInput{
-  flex:1; padding:1rem 1.2rem; border-radius:999px; border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.06); color:white; outline:none; font-size:1rem;
-}
-#chatInput::placeholder{ color:rgba(235,240,255,.45) }
-.icon-btn{
-  width:46px; height:46px; display:inline-grid; place-items:center; border-radius:999px; border:0; cursor:pointer;
-  background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); color:white;
-}
-.send-btn{ padding:.9rem 1.2rem; border-radius:999px; border:0; background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); color:white; cursor:pointer }
-
-/* PRACTICES */
-.practice{ display:flex; flex-direction:column; gap:12px }
-.pcard{ padding:16px; border-radius:16px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1) }
-.pcard h4{ margin:0 0 6px }
-.pcard .mini{ color:var(--text-dim) }
-.pcard .guide{ margin-top:8px; padding:.45rem .8rem; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:transparent; color:var(--text); cursor:pointer }
-
-/* PORTALS (single-page anchors instead of separate files) */
-.portals{ max-width:1200px; margin:60px auto; padding:0 16px; display:grid; gap:18px; grid-template-columns: repeat(4,minmax(0,1fr)) }
-.portal{ background:var(--card); border:1px solid var(--card-b); border-radius:22px; padding:20px }
-.portal h3{ margin:0 0 10px }
-.portal p{ margin:0 0 12px; color:var(--text-dim) }
-.portal a{ display:inline-block; text-decoration:none; color:white; background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); padding:.6rem .9rem; border-radius:999px }
-
-/* FOOTER */
-footer{ border-top:1px solid rgba(255,255,255,.06); padding:28px 16px; text-align:center; color:var(--muted) }
-
-/* Mobile */
-@media (max-width: 980px){
-  .plans{ grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .grid-2{ grid-template-columns: 1fr; }
-  .portals{ grid-template-columns: repeat(2,minmax(0,1fr)) }
-}
-@media (max-width: 560px){
-  .plans, .portals{ grid-template-columns: 1fr; }
-}
-</style>
+    /* Sections */
+    section{position:relative; z-index:1}
+    .stack{max-width:1100px; margin:0 auto; padding:80px 16px}
+    h2.title{
+      font-weight:800; letter-spacing:.04em; font-size:clamp(1.6rem, 3.8vw, 2.6rem);
+      background:linear-gradient(120deg, #fff, var(--lav), var(--sky), #fff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0 0 16px
+    }
+    .cols{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+    @media(max-width:900px){.cols{grid-template-columns:1fr}}
+    .card{
+      padding:22px; border-radius:16px; background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.12)
+    }
+    .muted{color:var(--ink-2)}
+    footer{padding:60px 16px; border-top:1px solid rgba(255,255,255,.08); text-align:center; color:var(--ink-3)}
+  </style>
 </head>
 <body>
-
-<nav>
-  <div class="brand">V&nbsp;E&nbsp;R&nbsp;A</div>
-  <div class="nav-links">
-    <a href="#portals">Portals</a>
-    <a href="#experience">Experience VERA</a>
-    <a href="#about">About</a>
-  </div>
-  <button class="nav-cta" onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})">Try Now</button>
-</nav>
-
-<section class="hero">
-  <h1>Your Nervous System<br/>Is Finally Speaking</h1>
-  <p>Real-time somatic coaching, voice-guided protocols, and a companion that speaks the language of your fascia. Breathe. We listen.</p>
-</section>
-
-<section class="plans" id="plans">
-  <div class="card">
-    <small>EXPLORER</small>
-    <h3>Gentle daily check-ins</h3>
-    <div class="price">$19<span style="font-size:.9rem">/mo</span></div>
-    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Start Exploring</button>
-  </div>
-  <div class="card">
-    <small>REGULATOR</small>
-    <h3>Advanced regulation</h3>
-    <div class="price">$39<span style="font-size:.9rem">/mo</span></div>
-    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Get Regulated</button>
-  </div>
-  <div class="card">
-    <small>INTEGRATOR</small>
-    <h3>Custom protocols</h3>
-    <div class="price">$79<span style="font-size:.9rem">/mo</span></div>
-    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Full Integration</button>
-  </div>
-  <div class="card" style="border-color:rgba(255,215,0,.35)">
-    <small style="color:var(--gold)">ENTERPRISE</small>
-    <h3>Organizations & teams</h3>
-    <div class="price">Custom</div>
-    <button class="btn" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Contact Sales</button>
-  </div>
-</section>
-
-<section class="section grid-2" id="experience">
-  <!-- Chat panel -->
-  <div class="panel">
-    <h3 style="margin:6px 0 12px">Speak with VERA</h3>
-    <div class="quick">
-      <button class="chip" onclick="quick('I feel tight in my chest')">I feel tight in my chest</button>
-      <button class="chip" onclick="quick('My body feels anxious')">My body feels anxious</button>
-      <button class="chip" onclick="quick(`I can't relax`)">I can't relax</button>
-      <button class="chip" onclick="quick('Help me feel safe')">Help me feel safe</button>
+  <div class="banner">⚠️ TEST MODE — Use Stripe test card 4242 4242 4242 4242 (any future date & CVC)</div>
+  <nav>
+    <div class="brand" onclick="location.href='/'">VERA</div>
+    <div class="menu" role="navigation" aria-label="Main">
+      <a href="#portals">Plans</a>
+      <a href="#method">Method</a>
+      <a href="#experience">Experience</a>
+      <button class="cta" onclick="openAuth('signup')">Join Beta</button>
     </div>
+  </nav>
 
-    <div id="messages" class="messages" aria-live="polite"></div>
+  <!-- Living background -->
+  <canvas id="neuroCanvas" aria-hidden="true"></canvas>
+  <div class="glow" aria-hidden="true"></div>
 
-    <div class="input-row">
-      <input id="chatInput" placeholder="Tell VERA what your body is saying…" autocomplete="off" />
-      <button class="icon-btn" id="voiceBtn" title="Toggle voice" onclick="voiceActive=!voiceActive; this.style.opacity=voiceActive?1:.7">🎤</button>
-      <button class="send-btn" onclick="send()">Send</button>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1 class="headline">Where Your Nervous System Speaks — and Is Heard</h1>
+      <p class="sub">VERA is a voice-guided somatic companion. Not chatter — presence. Real-time regulation that meets your fascia, breath, and patterns with precise micro-interventions.</p>
+      <div class="hero-actions">
+        <button class="cta" onclick="openDock()">Talk to VERA</button>
+        <button class="ghost" onclick="document.getElementById('portals').scrollIntoView({behavior:'smooth'})">Explore Plans</button>
+      </div>
+      <p class="note">Audio-reactive background responds to VERA’s voice. Toggle voice in the chat dock.</p>
     </div>
-    <div style="margin-top:6px; font-size:.9rem; color:var(--muted)">Voice uses your ElevenLabs voice via <code>/api/vera-voice</code>.</div>
-    <audio id="veraAudio" preload="auto"></audio>
-  </div>
+  </header>
 
-  <!-- Practices -->
-  <div class="panel">
-    <h3 style="margin:6px 0 12px">Somatic micro-practices</h3>
-    <div class="practice">
-      <div class="pcard">
-        <h4>Square Breath</h4>
-        <div class="mini">Inhale 4 • Hold 4 • Exhale 4 • Hold 4 — repeat 4x.</div>
-        <button class="guide" onclick="speak(`Let’s breathe together. Inhale for four—one, two, three, four. Hold for four—one, two, three, four. Exhale for four. Hold for four. Beautiful. Repeat.`)">Guide me</button>
+  <!-- PORTALS -->
+  <section id="portals" class="stack">
+    <h2 class="title">Choose Your Portal</h2>
+    <div class="portals">
+      <article class="portal" onclick="enter('explorer')">
+        <div class="ink"></div>
+        <h3>EXPLORER</h3>
+        <div class="price">$19<span style="font-size:.9rem; opacity:.75">/mo</span></div>
+        <ul>
+          <li>Daily check-ins</li><li>Core VERA conversations</li><li>3 guided practices/day</li>
+        </ul>
+        <a class="go" href="portal-explorer.html" onclick="remember('explorer')">Enter →</a>
+      </article>
+
+      <article class="portal primary" onclick="enter('regulator')">
+        <div class="chip">POPULAR</div><div class="ink"></div>
+        <h3>REGULATOR</h3>
+        <div class="price">$39<span style="font-size:.9rem; opacity:.75">/mo</span></div>
+        <ul>
+          <li>Unlimited conversations</li><li>Advanced protocols</li><li>Voice sessions + HRV</li>
+        </ul>
+        <a class="go" href="portal-regulator.html" onclick="remember('regulator')">Enter →</a>
+      </article>
+
+      <article class="portal" onclick="enter('integrator')">
+        <div class="ink"></div>
+        <h3>INTEGRATOR</h3>
+        <div class="price">$79<span style="font-size:.9rem; opacity:.75">/mo</span></div>
+        <ul>
+          <li>Everything in Regulator</li><li>1:1 monthly sessions</li><li>Custom trauma maps</li>
+        </ul>
+        <a class="go" href="portal-integrator.html" onclick="remember('integrator')">Enter →</a>
+      </article>
+
+      <article class="portal" onclick="enter('enterprise')">
+        <div class="ink"></div>
+        <h3>ENTERPRISE</h3>
+        <div class="price">Custom</div>
+        <ul>
+          <li>Org-wide deployment</li><li>HIPAA + SSO</li><li>Dedicated success</li>
+        </ul>
+        <a class="go" href="portal-enterprise.html" onclick="remember('enterprise')">Enter →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="stack">
+    <h2 class="title">Feel VERA’s Presence</h2>
+    <div class="cols">
+      <div class="card">
+        <h3>Breath Cadence</h3>
+        <p class="muted">A gentle 4-4-6 plus micro-pauses. Click to begin and enable voice to hear VERA guide you.</p>
+        <button class="cta" onclick="guideBreath()">Begin 4-4-6</button>
       </div>
-      <div class="pcard">
-        <h4>Kelp Sway</h4>
-        <div class="mini">Stand or sit and let your spine sway like kelp in warm water. No forcing—just allowing.</div>
-        <button class="guide" onclick="speak(`Let your body sway gently, like kelp in warm water. Your spine knows how to move. Trust it. You are safe.`)">Guide me</button>
+      <div class="card">
+        <h3>Sway Protocol</h3>
+        <p class="muted">“Kelp in warm water” patterning to discharge excess sympathetic energy.</p>
+        <button class="ghost" onclick="speak('Let your body sway gently. No forcing, just allowing. Your spine knows how to move.')">Play Voice</button>
       </div>
-      <div class="pcard">
-        <h4>5-4-3-2-1 Ground</h4>
-        <div class="mini">5 see • 4 touch • 3 hear • 2 smell • 1 taste.</div>
-        <button class="guide" onclick="speak(`Notice five things you can see, four you can touch, three you can hear, two you can smell, and one you can taste. You’re here. You’re safe.`)">Guide me</button>
+      <div class="card">
+        <h3>5-4-3-2-1 Ground</h3>
+        <p class="muted">Evidence of safety for the midbrain. VERA narrates while the background calms.</p>
+        <button class="ghost" onclick="speak('Notice five things you can see. Four you can touch. Three you can hear. Two you can smell. One you can taste.')">Play Voice</button>
       </div>
     </div>
+  </section>
+
+  <!-- METHOD -->
+  <section id="method" class="stack">
+    <h2 class="title">The VERA Method™</h2>
+    <div class="cols">
+      <div class="card"><strong>I SENSE</strong><br><span class="muted">“Before words, I feel the signal.”</span></div>
+      <div class="card"><strong>I WITNESS</strong><br><span class="muted">“Nothing’s wrong with you. It’s protection.”</span></div>
+      <div class="card"><strong>I MAP</strong><br><span class="muted">“We locate it: left/right, front/back, surface/deep.”</span></div>
+      <div class="card"><strong>I SHIFT</strong><br><span class="muted">“One millimeter can change the whole story.”</span></div>
+      <div class="card"><strong>I INTEGRATE</strong><br><span class="muted">“Your system remembers, we remind.”</span></div>
+      <div class="card"><strong>I HOLD</strong><br><span class="muted">“You get to be exactly as you are.”</span></div>
+    </div>
+  </section>
+
+  <!-- Chat dock -->
+  <div class="dock">
+    <div class="panel" id="dock">
+      <header>
+        <div class="tag">VERA • LIVE</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="ghost" id="voiceToggle" aria-pressed="false" onclick="toggleVoice()">🎤 Voice: Off</button>
+          <button class="ghost" onclick="openDock(false)">Close</button>
+        </div>
+      </header>
+      <div class="feed" id="feed" role="log" aria-live="polite">
+        <div class="msg ai">“I’m here. What sensation is most alive right now — and where does it live?”</div>
+      </div>
+      <div class="composer">
+        <input id="composer" placeholder="Tell VERA what you’re noticing…" onkeydown="if(event.key==='Enter'){send()}" />
+        <button onclick="send()">Send</button>
+      </div>
+    </div>
+    <button class="bubble" aria-label="Open VERA" onclick="openDock(true)">💬</button>
   </div>
-</section>
 
-<!-- Single-page “portals” showcase -->
-<section class="portals" id="portals">
-  <div class="portal" id="portal-explorer">
-    <h3>Explorer</h3><p>Gentle daily check-ins, three guided practices.</p>
-    <a href="#experience">Open</a>
-  </div>
-  <div class="portal" id="portal-regulator">
-    <h3>Regulator</h3><p>Unlimited conversations, advanced protocols.</p>
-    <a href="#experience">Open</a>
-  </div>
-  <div class="portal" id="portal-integrator">
-    <h3>Integrator</h3><p>Custom maps & personal plans.</p>
-    <a href="#experience">Open</a>
-  </div>
-  <div class="portal" id="portal-enterprise">
-    <h3>Enterprise</h3><p>Org-wide deployment & analytics.</p>
-    <a href="#experience">Open</a>
-  </div>
-</section>
+  <footer>
+    © 2024 VERA Technologies • Educational only, not medical advice • Your data is encrypted end-to-end.
+  </footer>
 
-<section class="section" id="about">
-  <div class="panel" style="text-align:center">
-    <h3>About VERA</h3>
-    <p style="color:var(--text-dim);max-width:800px;margin:10px auto 0">
-      VERA listens to the language of your fascia, reflects sensation precisely, and guides micro-movements that create macro shifts.
-    </p>
-  </div>
-</section>
+  <!-- Audio element for ElevenLabs playback -->
+  <audio id="veraAudio" preload="auto"></audio>
 
-<footer>© 2025 VERA Technologies — Where your nervous system remembers safety</footer>
+  <script>
+    /* ---------- Local helpers ---------- */
+    const $ = (q)=>document.querySelector(q);
+    const $$ = (q)=>document.querySelectorAll(q);
+    const audioEl = $('#veraAudio');
 
-<script>
-/* -------- robust UI (typing guaranteed) -------- */
-const messages = document.getElementById('messages');
-const input = document.getElementById('chatInput');
-const audioEl = document.getElementById('veraAudio');
-let voiceActive = true;
-
-function addMsg(who, text){
-  const row = document.createElement('div'); row.className = 'msg '+who;
-  const b = document.createElement('div'); b.className='bubble'; b.textContent=text;
-  row.appendChild(b); messages.appendChild(row);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function intro(){
-  addMsg('vera','“I’m here. What sensation is most alive right now? Where does it live in your body?”');
-}
-intro();
-
-function quick(t){ input.value=t; send(); }
-input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); send(); } });
-
-function send(){
-  const text = (input.value||'').trim();
-  if(!text) return;
-  addMsg('user', text);
-  input.value='';
-  const reply = respond(text);
-  setTimeout(()=>{ addMsg('vera', reply); if(voiceActive) speak(reply); }, 350);
-}
-
-function respond(user){
-  const u = user.toLowerCase();
-  const base = (() => {
-    if(u.includes('chest')) return "Your chest is speaking—heart armor. Breathe into the edges and let your sternum float 1%.";
-    if(u.includes('tight')) return "I feel that tightness with you. Thank the protection and invite a 1-millimeter softening.";
-    if(u.includes('anx')||u.includes('panic')) return "Your system is protecting you. Press your feet down gently for two breaths—you’re here.";
-    if(u.includes('relax')) return "Try a micro-release: clench for two seconds, then melt open. Feel the difference.";
-    if(u.includes('safe')) return "Safety is a felt sense. Name five things you see, four to touch, three you hear… I’m with you.";
-    return "I hear you. Tell me: is the sensation sharp or dull, hot or cool, moving or still?";
-  })();
-  const follow = " Where exactly is it—front/back, left/right, surface/deep? Give me three words for its texture.";
-  return base + follow;
-}
-
-/* -------- ElevenLabs voice (with graceful fallback) -------- */
-async function speak(text){
-  try{
-    const r = await fetch('/api/vera-voice', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text })
-    });
-    const ct = r.headers.get('content-type')||'';
-    if(!r.ok || ct.includes('application/json')){
-      const err = await r.json().catch(()=>({}));
-      console.warn('TTS error', err);
-      return fallbackSpeak(text);
+    /* ---------- Remember plan + enter portals ---------- */
+    function remember(plan){ try{ localStorage.setItem('vera_plan', plan) }catch(e){} }
+    function enter(plan){
+      remember(plan);
+      location.href = 'portal-' + plan + '.html';
     }
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    audioEl.src = url;
-    await audioEl.play().catch(()=>{});
-    audioEl.onended = () => URL.revokeObjectURL(url);
-  }catch(e){
-    console.warn('TTS fetch failed', e);
-    fallbackSpeak(text);
-  }
-}
-function fallbackSpeak(text){
-  if(!('speechSynthesis' in window)) return;
-  const u = new SpeechSynthesisUtterance(text); u.rate=.95; u.pitch=1.05;
-  speechSynthesis.speak(u);
-}
-</script>
+
+    /* ---------- Dock / Chat ---------- */
+    function openDock(state){
+      const el = $('#dock'); if(state===true) el.classList.add('open');
+      else if(state===false) el.classList.remove('open');
+      else el.classList.toggle('open');
+      if(el.classList.contains('open')) $('#composer').focus({preventScroll:true});
+    }
+    let voiceOn = false;
+    function toggleVoice(){
+      voiceOn = !voiceOn;
+      const t = $('#voiceToggle');
+      t.innerText = voiceOn ? '🎤 Voice: On' : '🎤 Voice: Off';
+      t.setAttribute('aria-pressed', voiceOn?'true':'false');
+    }
+
+    function feedAppend(text, me=false){
+      const el = document.createElement('div');
+      el.className = 'msg ' + (me?'me':'ai');
+      el.textContent = text;
+      $('#feed').appendChild(el);
+      $('#feed').scrollTop = $('#feed').scrollHeight;
+    }
+
+    function aiReply(user){
+      const u = user.toLowerCase();
+      const bank = [
+        ['tight', "I feel that tightness with you. Thank it for protecting you. Let the area move one millimeter and tell me if it’s dull, sharp, warm or cool."],
+        ['chest', "Your chest is speaking. Lift the sternum 1% and breathe around the edges of the sensation, not straight through it. What changes?"],
+        ['anx', "Brilliant protection. Press your feet into the floor for two slow breaths. From 1–10, where is the charge now?"],
+        ['relax', "Instead of ‘relax’, try contrast: clench your hands for two seconds, then melt them open. Notice the difference."],
+        ['safe', "Safety is evidence. Name five things you can see, four you can touch, three you hear, two you smell, one you taste. I’m here."],
+        ['help', "I’m here. Where exactly is it — left/right, front/back, surface/deep? Give me three words for its texture."]
+      ];
+      let resp = "I hear you. Where is it located (front/back, left/right, surface/deep)? The more specific we are, the faster it unwinds.";
+      for(const [k,v] of bank){ if(u.includes(k)){ resp = v; break; } }
+      return resp;
+    }
+
+    async function send(){
+      const i = $('#composer'); const v = (i.value||'').trim(); if(!v) return;
+      feedAppend(v, true); i.value=''; i.focus();
+      setTimeout(async ()=>{
+        const r = aiReply(v);
+        feedAppend(r, false);
+        if(voiceOn) await speak(r);
+      }, 380);
+    }
+
+    /* ---------- Breath guide ---------- */
+    async function guideBreath(){
+      const seq = [
+        "Let’s breathe together.",
+        "Inhale slowly for four… one… two… three… four.",
+        "Hold for four… one… two… three… four.",
+        "Exhale for six… one… two… three… four… five… six.",
+        "Beautiful."
+      ];
+      for(const line of seq){ if(voiceOn) await speak(line); await wait(200); }
+    }
+    const wait = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+    /* ---------- ElevenLabs TTS with caching + speechSynthesis fallback ---------- */
+    const cache = new Map(); // text -> Blob URL
+    async function speak(text){
+      try{
+        if(cache.has(text)){ audioEl.src = cache.get(text); await audioEl.play().catch(()=>{}); return; }
+        const res = await fetch('/api/vera-voice', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text})});
+        if(!res.ok) throw new Error('TTS proxy failed');
+        const blob = await res.blob(); const url = URL.createObjectURL(blob);
+        cache.set(text, url); audioEl.src = url; await audioEl.play().catch(()=>{});
+        setTimeout(()=>URL.revokeObjectURL(url), 30000);
+      }catch(e){
+        // Fallback to browser TTS
+        if('speechSynthesis' in window){
+          const u = new SpeechSynthesisUtterance(text); u.rate = .95; u.pitch = 1.05; speechSynthesis.speak(u);
+        }
+      }
+    }
+
+    /* ---------- Audio analyser drives background “charge” ---------- */
+    ;(function audioReactive(){
+      try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const src = ctx.createMediaElementSource(audioEl);
+        const analyser = ctx.createAnalyser(); analyser.fftSize = 256;
+        src.connect(analyser); analyser.connect(ctx.destination);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        function loop(){
+          analyser.getByteFrequencyData(data);
+          let sum = 0; for(let i=0;i<data.length;i++) sum+=data[i];
+          const avg = sum/data.length/255; // 0..1
+          document.documentElement.style.setProperty('--charge', (avg*1.2).toFixed(3));
+          requestAnimationFrame(loop);
+        }
+        audioEl.addEventListener('play', ()=>{ if(ctx.state==='suspended') ctx.resume(); loop(); }, {once:true});
+      }catch(e){}
+    })();
+
+    /* ---------- Canvas neurons (fast, pretty, reactive) ---------- */
+    ;(function neuronField(){
+      const c = document.getElementById('neuroCanvas'); const x = c.getContext('2d');
+      let W,H, DPR = Math.min(2, window.devicePixelRatio||1);
+      function size(){ W=innerWidth; H=innerHeight; c.width=W*DPR; c.height=H*DPR; c.style.width=W+'px'; c.style.height=H+'px'; x.setTransform(DPR,0,0,DPR,0,0); }
+      size(); addEventListener('resize', size);
+
+      const N = Math.min(180, Math.floor((W*H)/12000)); // adaptive density
+      const pts = Array.from({length:N}, ()=>spawn());
+      let mx = -9999, my = -9999;
+
+      function spawn(){
+        const speed = 0.2 + Math.random()*0.8;
+        return {x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*speed, vy:(Math.random()-.5)*speed, r:1+Math.random()*2};
+      }
+      addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+
+      function step(p){
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<-50||p.x>W+50||p.y<-50||p.y>H+50){ Object.assign(p, spawn()); }
+        // mouse gravity
+        const dx=p.x-mx, dy=p.y-my, d2=dx*dx+dy*dy;
+        if(d2<16000) { p.vx+=dx*-0.00003; p.vy+=dy*-0.00003; }
+      }
+
+      function draw(){
+        // subtle gradient wash
+        const g = x.createLinearGradient(0,0,W,H);
+        g.addColorStop(0,'rgba(177,156,217,.08)'); g.addColorStop(1,'rgba(100,181,246,.06)');
+        x.clearRect(0,0,W,H); x.fillStyle=g; x.fillRect(0,0,W,H);
+
+        // link distance varies with “charge”
+        const charge = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--charge'))||0;
+        const L = 120 + charge*120;
+
+        // draw connections
+        for(let i=0;i<N;i++){
+          const a=pts[i]; step(a);
+          for(let j=i+1;j<N;j++){
+            const b=pts[j];
+            const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+            if(d<L){
+              const o = (1 - d/L) * (0.35 + charge*0.5);
+              x.strokeStyle = `rgba(155,89,182,${o*.7})`;
+              x.beginPath(); x.moveTo(a.x,a.y); x.lineTo(b.x,b.y); x.stroke();
+            }
+          }
+        }
+        // draw points
+        for(const p of pts){
+          x.beginPath(); x.arc(p.x,p.y,p.r + charge*1.2,0,Math.PI*2);
+          x.fillStyle=`rgba(100,181,246,${.35 + charge*.5})`; x.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    /* ---------- Auth modal (minimal) ---------- */
+    function openAuth(tab='signup'){
+      alert('Auth flows are in Beta. We’ll redirect you to your portal after signup.');
+      localStorage.setItem('vera_plan', 'regulator');
+      location.href = 'portal-regulator.html';
+    }
+
+    /* ---------- On load: gentle scroll restore ---------- */
+    window.addEventListener('load', ()=>{ /* no-op placeholder */ });
+  </script>
 </body>
 </html>
