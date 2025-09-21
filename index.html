@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VERA — Your Nervous System Speaks</title>
+  <meta name="description" content="VERA — voice-guided nervous system intelligence, real-time regulation, and somatic exercises." />
+  <style>
+    :root{
+      --bg:#070B1F;
+      --bg2:#0E1333;
+      --glass:rgba(255,255,255,0.06);
+      --border:rgba(255,255,255,0.1);
+      --text:rgba(255,255,255,0.92);
+      --soft:rgba(255,255,255,0.72);
+      --muted:rgba(255,255,255,0.5);
+      --lav:#B19CD9;
+      --blue:#64B5F6;
+      --pink:#F8BBD0;
+      --gold:#FFD76A;
+      --emerald:#10B981;
+      --violet:#9B59B6;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 50% -200px, #1b204a 0%, transparent 70%),
+        radial-gradient(900px 500px at 90% 10%, #1e1c42 0%, transparent 70%),
+        linear-gradient(180deg, var(--bg) 0%, #000 100%);
+      overflow-x:hidden;
+    }
+    header{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:saturate(1.1) blur(12px);
+      background:linear-gradient(180deg, rgba(7,11,31,0.85), rgba(7,11,31,0.55));
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:1200px;margin:0 auto;padding:14px 22px;
+      display:flex;align-items:center;gap:18px;justify-content:space-between;
+    }
+    .logo{
+      letter-spacing:0.45em;font-weight:300;font-size:22px;cursor:pointer;user-select:none;
+      background:linear-gradient(135deg, #fff, var(--lav), var(--blue));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      padding-left:0.45em;
+    }
+    .nav a{color:var(--soft);text-decoration:none;margin:0 10px}
+    .nav a:hover{color:#fff}
+    .cta{padding:10px 16px;border-radius:999px;border:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(177,156,217,0.25), rgba(100,181,246,0.2));
+      color:#fff;cursor:pointer}
+    .cta:hover{box-shadow:0 10px 30px rgba(177,156,217,0.3)}
+    .wrap{max-width:1200px;margin:0 auto;padding:40px 22px}
+
+    /* HERO */
+    .hero{
+      padding:80px 22px 40px;
+      display:grid;place-items:center;position:relative;overflow:hidden;
+      min-height:76vh;
+    }
+    .orb{
+      position:absolute;inset:auto auto -80px -120px;
+      width:900px;height:900px;opacity:0.5;filter:blur(2px);
+      background:
+        radial-gradient(circle at 38% 38%, rgba(248,187,208,0.5), transparent 45%),
+        radial-gradient(circle at 60% 40%, rgba(100,181,246,0.45), transparent 55%),
+        radial-gradient(circle at 50% 52%, rgba(177,156,217,0.45), transparent 60%);
+      border-radius:50%;
+      box-shadow:0 0 220px rgba(155,89,182,0.55), inset 0 0 180px rgba(100,181,246,0.35);
+      animation:breath 8s ease-in-out infinite;
+    }
+    @keyframes breath {0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    .hero h1{
+      font-size:clamp(36px,6vw,68px);
+      line-height:1.08;
+      font-weight:200;
+      text-align:center;
+      background:linear-gradient(135deg,#fff 0%, var(--lav) 50%, var(--blue) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:16px;position:relative;
+    }
+    .hero p{color:var(--soft);text-align:center;max-width:760px;margin-bottom:26px}
+
+    /* PORTALS */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:16px;margin-top:20px
+    }
+    .card{
+      background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      border:1px solid var(--border);border-radius:20px;padding:24px;min-height:160px;
+      display:flex;flex-direction:column;justify-content:space-between;
+      box-shadow:0 20px 60px rgba(0,0,0,0.35);
+      transition:transform .2s ease, box-shadow .3s ease, border-color .2s ease;
+      cursor:pointer;text-decoration:none;color:#fff;
+    }
+    .card:hover{transform:translateY(-6px);border-color:rgba(177,156,217,0.5);box-shadow:0 28px 80px rgba(155,89,182,0.35)}
+    .card h3{font-weight:300;letter-spacing:.12em}
+    .tag{display:inline-block;margin-top:10px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;color:var(--soft);font-size:12px}
+    .card .price{font-size:32px;margin-top:10px}
+    .g1{background:linear-gradient(160deg, rgba(100,181,246,0.12), rgba(255,255,255,0.04))}
+    .g2{background:linear-gradient(160deg, rgba(177,156,217,0.13), rgba(255,255,255,0.04))}
+    .g3{background:linear-gradient(160deg, rgba(248,187,208,0.13), rgba(255,255,255,0.04))}
+    .g4{background:linear-gradient(160deg, rgba(255,215,122,0.11), rgba(255,255,255,0.03))}
+
+    /* CHAT */
+    .chat{
+      margin-top:64px;
+      display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:stretch;
+    }
+    .panel{
+      background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border:1px solid var(--border);border-radius:20px;padding:22px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+    .feed{height:360px;overflow:auto;border-radius:14px;padding:16px;background:rgba(0,0,0,0.25)}
+    .msg{margin:10px 0;max-width:75%}
+    .you{margin-left:auto;text-align:right;background:rgba(100,181,246,0.22);border:1px solid rgba(100,181,246,0.3);padding:10px 14px;border-radius:16px 16px 4px 16px}
+    .vera{background:linear-gradient(135deg, rgba(155,89,182,0.23), rgba(100,181,246,0.2));border:1px solid rgba(155,89,182,0.28);padding:10px 14px;border-radius:16px 16px 16px 4px}
+    .ctrl{display:flex;gap:10px;margin-top:12px}
+    .input{flex:1;padding:12px 16px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#fff}
+    .send{padding:12px 18px;border-radius:999px;border:1px solid var(--border);background:linear-gradient(135deg, var(--lav), var(--blue));color:#000;font-weight:600;cursor:pointer}
+    .pillbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+    .pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.04);cursor:pointer;color:var(--soft)}
+    .pill:hover{border-color:var(--lav);color:#fff}
+    .mini{font-size:12px;color:var(--muted);margin-top:8px}
+
+    footer{margin:80px auto 40px;text-align:center;color:var(--muted)}
+    .hr{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);margin:50px 0}
+
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr 1fr}
+      .chat{grid-template-columns:1fr}
+    }
+    @media (max-width:620px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo" onclick="location.href='/'">V E R A</div>
+      <nav>
+        <a href="#portals">Portals</a>
+        <a href="#experience">Experience VERA</a>
+        <a href="#about">About</a>
+      </nav>
+      <button class="cta" onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})">Try Now</button>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="orb" aria-hidden="true"></div>
+    <h1>Your Nervous System<br/>Is Finally Speaking</h1>
+    <p>Real-time somatic coaching, voice-guided protocols, and a companion that speaks the language of your fascia. Breathe. We listen.</p>
+
+    <section id="portals" class="wrap">
+      <div class="grid">
+        <a class="card g1" href="portal-explorer.html">
+          <div>
+            <h3>EXPLORER</h3>
+            <div class="tag">Gentle daily check-ins</div>
+          </div>
+          <div class="price">$19<span style="font-size:16px;color:var(--muted)">/mo</span></div>
+        </a>
+        <a class="card g2" href="portal-regulator.html">
+          <div>
+            <h3>REGULATOR</h3>
+            <div class="tag">Advanced regulation</div>
+          </div>
+          <div class="price">$39<span style="font-size:16px;color:var(--muted)">/mo</span></div>
+        </a>
+        <a class="card g3" href="portal-integrator.html">
+          <div>
+            <h3>INTEGRATOR</h3>
+            <div class="tag">Custom protocols</div>
+          </div>
+          <div class="price">$79<span style="font-size:16px;color:var(--muted)">/mo</span></div>
+        </a>
+        <a class="card g4" href="portal-enterprise.html">
+          <div>
+            <h3>ENTERPRISE</h3>
+            <div class="tag">Organizations & teams</div>
+          </div>
+          <div class="price">Custom</div>
+        </a>
+      </div>
+
+      <div class="hr"></div>
+
+      <section id="experience" class="chat">
+        <div class="panel">
+          <h3 style="font-weight:300;letter-spacing:.12em;margin-bottom:8px;">SPEAK WITH VERA</h3>
+          <div class="pillbar">
+            <button class="pill" onclick="quick('I feel tight in my chest')">I feel tight in my chest</button>
+            <button class="pill" onclick="quick('My body feels anxious')">My body feels anxious</button>
+            <button class="pill" onclick="quick('I cannot relax')">I can’t relax</button>
+            <button class="pill" onclick="quick('Help me feel safe')">Help me feel safe</button>
+          </div>
+          <div class="feed" id="feed">
+            <div class="msg vera">“I’m here. What sensation is most alive right now? Where does it live in your body?”</div>
+          </div>
+          <div class="ctrl">
+            <input id="input" class="input" placeholder="Tell VERA what your body is saying…" onkeydown="if(event.key==='Enter') send()" />
+            <button class="send" onclick="toggleVoice()" id="vbtn" title="Toggle voice">🎤</button>
+            <button class="send" onclick="send()">Send</button>
+          </div>
+          <div class="mini">Voice uses your ElevenLabs Voice ID via <code>/api/vera-voice</code>.</div>
+        </div>
+
+        <div class="panel">
+          <h3 style="font-weight:300;letter-spacing:.12em;margin-bottom:12px;">SOMATIC MICRO-PRACTICES</h3>
+          <div style="display:grid;gap:12px">
+            <div style="padding:14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.04)">
+              <strong>Square Breath</strong><br/>
+              Inhale 4 • Hold 4 • Exhale 4 • Hold 4 — repeat 4x.  
+              <button class="pill" onclick="voice('Inhale for four. Hold for four. Exhale for four. Hold for four. Beautiful.')">Guide me</button>
+            </div>
+            <div style="padding:14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.04)">
+              <strong>Kelp Sway</strong><br/>
+              Stand or sit and let your spine sway like kelp in warm water. No forcing—just allowing.  
+              <button class="pill" onclick="voice('Let your body sway gently, like kelp in warm water. No forcing, just allowing. Your spine knows how to move.')">Guide me</button>
+            </div>
+            <div style="padding:14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.04)">
+              <strong>5-4-3-2-1 Ground</strong><br/>
+              5 see • 4 touch • 3 hear • 2 smell • 1 taste.  
+              <button class="pill" onclick="voice('Notice five things you can see. Four you can touch. Three you can hear. Two you can smell. One you can taste. You are here, and you are safe.')">Guide me</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="about" class="wrap" style="margin-top:60px">
+      <div class="panel" style="padding:28px">
+        <h3 style="font-weight:300;letter-spacing:.12em;margin-bottom:8px;">VERA METHOD™</h3>
+        <p style="color:var(--soft);max-width:900px">
+          Sense • Witness • Map • Shift • Integrate • Hold. VERA pairs lived somatic wisdom with calm technology to help your system remember safety. No spiritual bypass. No push. Just precision, softness, and measurable nervous-system change.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 VERA Technologies — Where bodies remember safety</footer>
+
+  <audio id="veraAudio" preload="auto"></audio>
+
+  <script>
+    const feed = document.getElementById('feed');
+    const input = document.getElementById('input');
+    const audioEl = document.getElementById('veraAudio');
+    let voiceOn = true;
+
+    function addMsg(html, cls){ const d=document.createElement('div'); d.className='msg '+cls; d.innerHTML=html; feed.appendChild(d); feed.scrollTop=feed.scrollHeight; }
+    function quick(t){ input.value=t; send(); }
+
+    const baseReplies = {
+      tight:"I feel that tightness with you. Place one hand there. Let your shoulders drop 1%. Thank the tightness for protecting you, then invite 1% more softness.",
+      chest:"Your chest is speaking—heart armor. Breathe around the edges, not the center. Float your sternum. Tell me 3 words: warm/cool, sharp/dull, still/moving?",
+      anxious:"Your system is brilliant—it’s protecting you. Press your feet into the floor for two breaths. What number is your charge now, 1–10?",
+      relax:"Let’s not chase relaxation. Try this: clench your fists for 2 seconds, then melt them open. What changed, even slightly?",
+      safe:"Safety is sensed, not thought. Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. You’re here.",
+      default:"I hear you. Where exactly does this live—left/right, front/back, surface/deep? Give me 3 texture words. Naming it helps fascia feel seen."
+    };
+
+    function pickReply(t){
+      const s=t.toLowerCase();
+      if(s.includes('tight')) return baseReplies.tight;
+      if(s.includes('chest')||s.includes('heart')) return baseReplies.chest;
+      if(s.includes('anx')) return baseReplies.anxious;
+      if(s.includes('relax')) return baseReplies.relax;
+      if(s.includes('safe')) return baseReplies.safe;
+      return baseReplies.default;
+    }
+
+    async function send(){
+      const t = (input.value||'').trim();
+      if(!t) return;
+      addMsg(t,'you'); input.value='';
+
+      const r = pickReply(t) + " If you track a 1% change, tell me where it shows up first.";
+      addMsg(r,'vera');
+      if(voiceOn) voice(r);
+    }
+
+    function toggleVoice(){
+      voiceOn = !voiceOn;
+      const b=document.getElementById('vbtn');
+      b.style.opacity = voiceOn?1:0.6;
+      b.textContent = voiceOn?'🎤':'🔇';
+    }
+
+    async function voice(text){
+      try{
+        const resp = await fetch('/api/vera-voice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+        if(!resp.ok) throw new Error(await resp.text());
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        audioEl.src = url;
+        await audioEl.play().catch(()=>{});
+        setTimeout(()=>URL.revokeObjectURL(url), 8000);
+      }catch(e){
+        // graceful fallback: web speech if available
+        if('speechSynthesis' in window){
+          const u=new SpeechSynthesisUtterance(text);u.rate=.95;u.pitch=1.02;speechSynthesis.speak(u);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
