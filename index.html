@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>VERA — Speak & Be Held</title>
-<meta name="description" content="Tap the living orb, speak to VERA, and receive a soothing, voiced response with somatic intelligence." />
-
+<meta name="description" content="Tap the living orb, speak to VERA, and receive a soothing, voiced response with somatic intelligence."/>
 <style>
   :root{
     --bg-deep:#070a1a;
@@ -15,20 +14,13 @@
     --text:rgba(255,255,255,.92);
     --soft:rgba(255,255,255,.70);
     --muted:rgba(255,255,255,.45);
-    --c1:#9B59B6; /* amethyst */
-    --c2:#64B5F6; /* neural blue */
-    --c3:#F8BBD0; /* glow pink */
-    --c4:#10B981; /* emerald */
-    --c5:#FFD700; /* soft gold */
-    --orb-a: #c79bff;
-    --orb-b: #6bc9ff;
-    --orb-ring: rgba(155,89,182,.35);
+    --c1:#9B59B6; --c2:#64B5F6; --c3:#F8BBD0; --c4:#10B981; --c5:#FFD700;
+    --orb-a:#c79bff; --orb-b:#6bc9ff;
   }
-
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   body{
-    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+    font-family: ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
     color:var(--text);
     background:
       radial-gradient(1200px 700px at 50% -10%, #1b2150 0%, transparent 60%),
@@ -36,374 +28,256 @@
       linear-gradient(180deg, var(--bg-mid), var(--bg-deep) 55%, #000 100%);
     overflow:hidden;
   }
-
-  /* Cosmic field */
-  .field{ position:fixed; inset:0; z-index:0; pointer-events:none; }
-  .spark{
-    position:absolute; width:2px; height:2px; border-radius:50%;
-    background:radial-gradient(circle, #fff, rgba(255,255,255,0));
-    opacity:.8; filter:drop-shadow(0 0 8px rgba(255,255,255,.55));
-    animation: drift linear infinite;
+  /* Stars */
+  .field{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .spark{position:absolute;width:2px;height:2px;border-radius:50%;
+    background:radial-gradient(circle,#fff,rgba(255,255,255,0));
+    opacity:.8;filter:drop-shadow(0 0 8px rgba(255,255,255,.55));
+    animation:drift linear infinite;}
+  @keyframes drift{
+    0%{transform:translate3d(var(--x),var(--y),0) scale(1);opacity:.2}
+    50%{opacity:.9}
+    100%{transform:translate3d(calc(var(--x)+var(--dx)),calc(var(--y)+var(--dy)),0) scale(1.1);opacity:.2}
   }
-  @keyframes drift {
-    0% { transform:translate3d(var(--x), var(--y), 0) scale(1); opacity:.2; }
-    50% { opacity:.9; }
-    100% { transform:translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) scale(1.1); opacity:.2; }
-  }
-
   /* Header */
-  .top{
-    position:fixed; top:0; left:0; right:0; height:64px; z-index:3;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 20px; backdrop-filter: blur(12px);
-    background:linear-gradient(180deg, rgba(7,10,26,.75), rgba(7,10,26,.35));
-    border-bottom:1px solid var(--line);
-  }
-  .brand{
-    letter-spacing:.35em; font-weight:300; font-size:20px;
-    background:linear-gradient(90deg, var(--c3), var(--c1), var(--c2));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    user-select:none; cursor:pointer;
-  }
-  .status{
-    font-size:13px; color:var(--muted);
-  }
-
-  /* Center stage */
-  .stage{
-    position:relative; z-index:2;
-    height:100dvh; display:grid; place-items:center; padding-top:24px;
-  }
-
-  /* The Orb */
-  .orb-wrap{
-    position:relative; width:min(78vmin,560px); aspect-ratio:1/1;
-    display:grid; place-items:center; cursor:pointer; user-select:none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .hint{
-    position:absolute; bottom:-56px; left:50%; transform:translateX(-50%);
-    font-size:14px; color:var(--soft);
-    opacity:.85;
-  }
-
-  .orb{
-    width:100%; height:100%; border-radius:50%;
+  .top{position:fixed;top:0;left:0;right:0;height:64px;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+    backdrop-filter:blur(12px);background:linear-gradient(180deg,rgba(7,10,26,.75),rgba(7,10,26,.35));border-bottom:1px solid var(--line);}
+  .brand{letter-spacing:.35em;font-weight:300;font-size:20px;background:linear-gradient(90deg,var(--c3),var(--c1),var(--c2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;user-select:none;cursor:pointer;}
+  .status{font-size:13px;color:var(--muted);}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);font-size:13px;padding:8px 10px;border-radius:10px;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.10)}
+  .pill{padding:7px 10px;border-radius:999px;font-size:12px;color:#111;background:linear-gradient(90deg,#ffd66b,#ffa646);box-shadow:0 6px 22px rgba(255,166,70,.25)}
+  /* Stage */
+  .stage{position:relative;z-index:2;height:100dvh;display:grid;place-items:center;padding-top:24px}
+  .orb-wrap{position:relative;width:min(78vmin,560px);aspect-ratio:1/1;display:grid;place-items:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+  .hint{position:absolute;bottom:-56px;left:50%;transform:translateX(-50%);font-size:14px;color:var(--soft);opacity:.85;}
+  .orb{width:100%;height:100%;border-radius:50%;
     background:
       radial-gradient(120% 120% at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
-      conic-gradient(from 0deg, var(--orb-a), var(--orb-b), var(--c3), var(--c2), var(--c1), var(--c4), var(--c5), var(--orb-a));
-    box-shadow:
-      inset 0 0 120px rgba(255,255,255,.08),
-      0 0 120px rgba(123, 97, 255, .20),
-      0 0 240px rgba(75, 229, 255, .18);
-    position:relative;
-    transition: transform .25s ease, filter .25s ease;
-    transform: perspective(800px) rotateX(14deg);
-    pointer-events:auto;
+      conic-gradient(from 0deg,var(--orb-a),var(--orb-b),var(--c3),var(--c2),var(--c1),var(--c4),var(--c5),var(--orb-a));
+    box-shadow:inset 0 0 120px rgba(255,255,255,.08),0 0 120px rgba(123,97,255,.20),0 0 240px rgba(75,229,255,.18);
+    position:relative;transition:transform .25s ease,filter .25s ease;transform:perspective(800px) rotateX(14deg);pointer-events:auto;}
+  .orb::before{content:"";position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(closest-side,rgba(155,89,182,.28),rgba(100,181,246,.18),rgba(0,0,0,0));filter:blur(18px);}
+  .rings{position:absolute;inset:-6%;border-radius:50%;pointer-events:none;background:
+    radial-gradient(closest-side,rgba(255,255,255,.08),rgba(255,255,255,0) 60%),
+    conic-gradient(from 0deg,rgba(255,255,255,0),rgba(255,255,255,.15),rgba(255,255,255,0) 60%);
+    mask:radial-gradient(closest-side,rgba(0,0,0,0) 68%,rgba(0,0,0,1) 72%,rgba(0,0,0,1) 82%,rgba(0,0,0,0) 86%);
+    animation:slowspin 16s linear infinite;}
+  @keyframes slowspin{to{transform:rotate(360deg)}}
+  .orb-wrap.listening .orb{transform:perspective(800px) rotateX(0deg) scale(1.02);filter:drop-shadow(0 0 22px rgba(100,181,246,.35));animation:pulse 1.3s ease-in-out infinite;}
+  @keyframes pulse{50%{box-shadow:inset 0 0 150px rgba(255,255,255,.10),0 0 160px rgba(100,181,246,.35)}}
+  .orb-wrap.speaking .orb{animation:speakglow 1.2s ease-in-out infinite;}
+  @keyframes speakglow{
+    0%{box-shadow:inset 0 0 160px rgba(255,255,255,.12),0 0 220px rgba(155,89,182,.40)}
+    50%{box-shadow:inset 0 0 160px rgba(255,255,255,.12),0 0 240px rgba(248,187,208,.45)}
+    100%{box-shadow:inset 0 0 160px rgba(255,255,255,.12),0 0 220px rgba(100,181,246,.42)}
   }
-  .orb::before{
-    content:""; position:absolute; inset:-18px; border-radius:50%;
-    background: radial-gradient(closest-side, rgba(155,89,182,.28), rgba(100,181,246,.18), rgba(0,0,0,0));
-    filter: blur(18px);
-  }
-
-  /* Rings */
-  .rings{
-    position:absolute; inset:-6%; border-radius:50%; pointer-events:none;
-    background:
-      radial-gradient(closest-side, rgba(255,255,255,.08), rgba(255,255,255,0) 60%),
-      conic-gradient(from 0deg, rgba(255,255,255,.0), rgba(255,255,255,.15), rgba(255,255,255,.0) 60%);
-    mask: radial-gradient(closest-side, rgba(0,0,0,0) 68%, rgba(0,0,0,1) 72%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 86%);
-    animation: slowspin 16s linear infinite;
-  }
-  @keyframes slowspin { to { transform: rotate(360deg); } }
-
-  /* States */
-  .orb-wrap.listening .orb{
-    transform: perspective(800px) rotateX(0deg) scale(1.02);
-    filter: drop-shadow(0 0 22px rgba(100,181,246,.35));
-    animation: pulse 1.3s ease-in-out infinite;
-  }
-  .orb-wrap.speaking .orb{ animation: speakglow 1.2s ease-in-out infinite; }
-  @keyframes pulse { 50%{ box-shadow: inset 0 0 150px rgba(255,255,255,.10), 0 0 160px rgba(100,181,246,.35); } }
-  @keyframes speakglow {
-    0%   { box-shadow: inset 0 0 160px rgba(255,255,255,.12), 0 0 220px rgba(155,89,182,.40); }
-    50%  { box-shadow: inset 0 0 160px rgba(255,255,255,.12), 0 0 240px rgba(248,187,208,.45); }
-    100% { box-shadow: inset 0 0 160px rgba(255,255,255,.12), 0 0 220px rgba(100,181,246,.42); }
-  }
-
-  /* Transcript glass */
-  .glass{
-    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
-    width:min(90vw, 980px);
-    padding:14px 16px; border-radius:14px;
-    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-    border:1px solid var(--line);
-    backdrop-filter: blur(12px);
-    color:var(--soft); font-size:14px; line-height:1.5;
-    z-index:3; max-height:28dvh; overflow:auto;
-  }
-  .row{ display:flex; gap:10px; margin:6px 0; align-items:flex-start; }
-  .tag{ font-size:12px; color:var(--muted); min-width:60px; text-align:right; }
-  .bubble{
-    flex:1; padding:10px 12px; border-radius:12px;
-    background:rgba(255,255,255,.06); border:1px solid var(--line);
-    color:var(--text);
-  }
-
-  .controls{
-    position:fixed; right:16px; top:72px; z-index:4;
-    display:flex; gap:8px; flex-wrap:wrap;
-  }
-  .btn{
-    background:rgba(255,255,255,.06);
-    border:1px solid var(--line);
-    color:var(--text); font-size:13px; padding:8px 10px; border-radius:10px;
-    cursor:pointer;
-  }
-  .btn:hover{ background:rgba(255,255,255,.10); }
-  .pill{
-    padding:7px 10px; border-radius:999px; font-size:12px; color:#111;
-    background:linear-gradient(90deg, #ffd66b, #ffa646);
-    box-shadow:0 6px 22px rgba(255,166,70,.25);
-  }
-
-  /* Accessibility focus */
-  .orb-wrap:focus-visible { outline: 2px solid #8ecfff; outline-offset: 6px; border-radius: 50%; }
+  /* Transcript */
+  .glass{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);width:min(90vw,980px);padding:14px 16px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--line);backdrop-filter:blur(12px);
+    color:var(--soft);font-size:14px;line-height:1.5;z-index:3;max-height:28dvh;overflow:auto}
+  .row{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+  .tag{font-size:12px;color:var(--muted);min-width:60px;text-align:right}
+  .bubble{flex:1;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text)}
+  .orb-wrap:focus-visible{outline:2px solid #8ecfff;outline-offset:6px;border-radius:50%}
 </style>
 </head>
 <body>
-  <!-- cosmic particles -->
-  <div class="field" id="field"></div>
+<div class="field" id="field"></div>
 
-  <header class="top">
-    <div class="brand" onclick="location.href='/'">VERA</div>
-    <div class="status">
-      <span id="status">idle</span>
-      &nbsp;•&nbsp;<span class="pill">Tap the orb and speak</span>
-    </div>
-    <div class="controls">
-      <button class="btn" id="toggle-voice">Voice: ElevenLabs</button>
-      <button class="btn" id="clear">Clear</button>
-    </div>
-  </header>
+<header class="top">
+  <div class="brand" onclick="location.href='/'">VERA</div>
+  <div class="status">
+    <span id="status">idle</span>
+    &nbsp;•&nbsp;<span class="pill" id="mode-pill">Mode: Server STT (hold to talk)</span>
+  </div>
+  <div class="controls">
+    <button class="btn" id="toggle-stt">Use: Server STT</button>
+    <button class="btn" id="toggle-voice">Voice: ElevenLabs</button>
+    <button class="btn" id="test-voice">Test Voice</button>
+    <button class="btn" id="clear">Clear</button>
+  </div>
+</header>
 
-  <main class="stage">
-    <button class="orb-wrap" id="orbWrap" aria-label="Tap to speak with VERA" title="Tap to speak with VERA">
-      <div class="orb" id="orb"></div>
-      <div class="rings"></div>
-      <div class="hint">Tap to speak • VERA will answer out loud</div>
-    </button>
-  </main>
+<main class="stage">
+  <!-- For Server STT: press and hold to record; For Browser STT: tap to start/stop -->
+  <button class="orb-wrap" id="orbWrap" aria-label="Talk to VERA">
+    <div class="orb" id="orb"></div>
+    <div class="rings"></div>
+    <div class="hint" id="hint">Hold to speak • VERA will answer out loud</div>
+  </button>
+</main>
 
-  <!-- transcript -->
-  <section class="glass" id="log" aria-live="polite"></section>
-
-  <!-- hidden audio for TTS -->
-  <audio id="voice" preload="auto" playsinline></audio>
+<section class="glass" id="log" aria-live="polite"></section>
+<audio id="voice" preload="auto" playsinline></audio>
 
 <script>
-/* ========= particles ========= */
+/* ======= Stars ======= */
 (function seedStars(){
-  const host = document.getElementById('field');
-  const N = 160;
-  const rnd = (a,b)=>Math.random()*(b-a)+a;
-  for(let i=0;i<N;i++){
-    const s = document.createElement('div');
-    s.className = 'spark';
-    const x = rnd(-50, window.innerWidth+50);
-    const y = rnd(-50, window.innerHeight+50);
-    const dx = rnd(-80, 80), dy = rnd(-60, 60);
-    s.style.setProperty('--x', x+'px');
-    s.style.setProperty('--y', y+'px');
-    s.style.setProperty('--dx', dx+'px');
-    s.style.setProperty('--dy', dy+'px');
-    s.style.animationDuration = rnd(18, 42)+'s';
-    s.style.opacity = Math.random()*.9+.1;
-    host.appendChild(s);
-  }
+  const host=document.getElementById('field'),N=160,r=(a,b)=>Math.random()*(b-a)+a;
+  for(let i=0;i<N;i++){const s=document.createElement('div');s.className='spark';
+    const x=r(-50,innerWidth+50),y=r(-50,innerHeight+50),dx=r(-80,80),dy=r(-60,60);
+    s.style.setProperty('--x',x+'px');s.style.setProperty('--y',y+'px');
+    s.style.setProperty('--dx',dx+'px');s.style.setProperty('--dy',dy+'px');
+    s.style.animationDuration=r(18,42)+'s';s.style.opacity=Math.random()*.9+.1;host.appendChild(s);}
 })();
 
-/* ========= state ========= */
-const statusEl = document.getElementById('status');
-const logEl = document.getElementById('log');
-const orbWrap = document.getElementById('orbWrap');
-const orb = document.getElementById('orb');
-const audioEl = document.getElementById('voice');
-const btnToggleVoice = document.getElementById('toggle-voice');
-const btnClear = document.getElementById('clear');
+/* ======= Elements & State ======= */
+const statusEl=document.getElementById('status');
+const logEl=document.getElementById('log');
+const orbWrap=document.getElementById('orbWrap');
+const orb=document.getElementById('orb');
+const audioEl=document.getElementById('voice');
+const btnToggleVoice=document.getElementById('toggle-voice');
+const btnToggleSTT=document.getElementById('toggle-stt');
+const btnTestVoice=document.getElementById('test-voice');
+const btnClear=document.getElementById('clear');
+const hint=document.getElementById('hint');
+const modePill=document.getElementById('mode-pill');
 
-let usingElevenLabs = true; // default to ElevenLabs (better quality)
-let listening = false;
-let speaking = false;
+let usingElevenLabs=true;
+let useServerSTT=true; // Reliable by default (Whisper)
+let listening=false, speaking=false, audioUnlocked=false;
+let mediaStream=null, recorder=null, chunks=[];
+const palettes=[['#c79bff','#6bc9ff'],['#f8bbd0','#9b59b6'],['#8ef6ff','#ffd66b'],['#64b5f6','#10b981'],['#ffd1f2','#b4b3ff']];
+function randomPalette(){return palettes[Math.floor(Math.random()*palettes.length)]}
+function setOrbPalette(a,b){orb.style.setProperty('--orb-a',a);orb.style.setProperty('--orb-b',b)}
+function sayStatus(s){statusEl.textContent=s}
+function addRow(tag,text){const row=document.createElement('div');row.className='row';
+  const t=document.createElement('div');t.className='tag';t.textContent=tag;
+  const b=document.createElement('div');b.className='bubble';b.textContent=text;
+  row.appendChild(t);row.appendChild(b);logEl.appendChild(row);logEl.scrollTop=logEl.scrollHeight;}
 
-// Conversation memory (kept on client and sent with each request)
-let history = [
-  { role:'system', content:
-    "You are VERA, a warm somatic intelligence that speaks in short, steady phrases. " +
-    "You always ask one gentle follow-up to help map sensations (location, texture, temperature, movement). " +
-    "Voice-friendly: keep sentences ~12-18 words. Avoid lists. No emojis." }
-];
+let history=[{role:'system',content:"You are VERA, a warm somatic intelligence. Speak in short, steady phrases. Always end with one gentle follow-up helping map sensations (location, texture, temperature, movement). Voice-friendly. No lists. No emojis."}];
 
-/* ========= helpers ========= */
-function sayStatus(s){ statusEl.textContent = s; }
-function addRow(tag, text){
-  const row = document.createElement('div'); row.className='row';
-  const t = document.createElement('div'); t.className='tag'; t.textContent = tag;
-  const b = document.createElement('div'); b.className='bubble'; b.textContent = text;
-  row.appendChild(t); row.appendChild(b); logEl.appendChild(row);
-  logEl.scrollTop = logEl.scrollHeight;
+/* ======= Audio Unlock (iOS/Chrome Autoplay) ======= */
+async function unlockAudio(){
+  if(audioUnlocked) return;
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain(); gain.gain.value=0.0001; // silent
+    osc.connect(gain).connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+0.05);
+    audioUnlocked=true;
+  }catch(e){}
 }
-function setOrbPalette(a,b){
-  orb.style.setProperty('--orb-a', a);
-  orb.style.setProperty('--orb-b', b);
-}
-const palettes = [
-  ['#c79bff','#6bc9ff'],
-  ['#f8bbd0','#9b59b6'],
-  ['#8ef6ff','#ffd66b'],
-  ['#64b5f6','#10b981'],
-  ['#ffd1f2','#b4b3ff']
-];
-function randomPalette(){ return palettes[Math.floor(Math.random()*palettes.length)]; }
 
-/* ========= voice output ========= */
+/* ======= Voice Out ======= */
 async function speak(text){
-  // palette bloom while speaking
-  const [a,b] = randomPalette();
-  setOrbPalette(a,b);
-
-  orbWrap.classList.add('speaking');
-  speaking = true; sayStatus('speaking');
-
-  // Try ElevenLabs first (server proxy). If it fails, fallback to speechSynthesis
+  const [a,b]=randomPalette(); setOrbPalette(a,b);
+  orbWrap.classList.add('speaking'); speaking=true; sayStatus('speaking');
   if(usingElevenLabs){
     try{
-      const res = await fetch('/api/vera-voice', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({ text })
-      });
-      if(!res.ok) throw new Error('TTS failed');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      audioEl.src = url;
-      await audioEl.play(); // user already interacted by tapping orb
-      audioEl.onended = () => {
-        URL.revokeObjectURL(url);
-        orbWrap.classList.remove('speaking');
-        speaking = false; sayStatus('idle');
-      };
+      const r=await fetch('/api/vera-voice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+      if(!r.ok) throw new Error('tts failed');
+      const blob=await r.blob(); const url=URL.createObjectURL(blob);
+      audioEl.src=url; await audioEl.play();
+      audioEl.onended=()=>{URL.revokeObjectURL(url); orbWrap.classList.remove('speaking'); speaking=false; sayStatus('idle');};
       return;
-    }catch(err){
-      console.warn('ElevenLabs failed, using speechSynthesis fallback:', err);
-    }
+    }catch(e){console.warn('ElevenLabs failed, using browser TTS',e)}
   }
-  // Fallback: browser TTS (try to pick a female voice)
-  const synth = window.speechSynthesis;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.93; utter.pitch = 1.07;
-  const pickVoice = () => {
-    const vs = synth.getVoices();
-    let v = vs.find(v=>/female|samantha|victoria|google uk english female/i.test(v.name)) || vs[0];
-    if(v) utter.voice = v;
-    synth.speak(utter);
-  };
-  if (synth.getVoices().length === 0) {
-    synth.onvoiceschanged = pickVoice;
-  } else {
-    pickVoice();
-  }
-  utter.onend = () => {
-    orbWrap.classList.remove('speaking');
-    speaking = false; sayStatus('idle');
-  };
+  // Browser fallback
+  const synth=window.speechSynthesis;
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.93; u.pitch=1.07;
+  const pick=()=>{const vs=synth.getVoices(); u.voice=vs.find(v=>/female|samantha|victoria|google uk english female/i.test(v.name))||vs[0]; synth.cancel(); synth.speak(u);};
+  if(synth.getVoices().length===0){synth.onvoiceschanged=pick;}else{pick();}
+  u.onend=()=>{orbWrap.classList.remove('speaking'); speaking=false; sayStatus('idle');};
 }
 
-/* ========= STT (speech -> text) ========= */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null;
+/* ======= Chat (OpenAI) ======= */
+async function chat(){
+  try{
+    const r=await fetch('/api/vera-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-12)})});
+    if(!r.ok) throw new Error('chat api failed');
+    const data=await r.json(); const reply=(data&&data.text)||"I'm here with you.";
+    history.push({role:'assistant',content:reply}); addRow('VERA',reply); await speak(reply);
+  }catch(e){
+    console.error(e);
+    const fallback="I'm here. Slow down with me. Where in your body is most alive right now?";
+    history.push({role:'assistant',content:fallback}); addRow('VERA',fallback); await speak(fallback);
+  }
+}
+
+/* ======= Browser STT (if available) ======= */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null;
 if(SR){
-  rec = new SR();
-  rec.lang = 'en-US';
-  rec.continuous = false; // single utterance, then stop
-  rec.interimResults = false;
-
-  rec.onstart = () => { listening = true; sayStatus('listening'); orbWrap.classList.add('listening'); };
-  rec.onerror = (e) => {
-    console.warn('recognition error', e);
-    listening = false; orbWrap.classList.remove('listening'); sayStatus('idle');
-  };
-  rec.onend = () => {
-    listening = false; orbWrap.classList.remove('listening'); if(!speaking) sayStatus('idle');
-  };
-  rec.onresult = (e) => {
-    const text = (e.results[0] && e.results[0][0] && e.results[0][0].transcript) || '';
-    if(!text) return;
-    addRow('You', text);
-    history.push({role:'user', content:text});
-    chat(text);
-  };
-}else{
-  addRow('System', 'Speech recognition is not supported in this browser.');
+  rec=new SR(); rec.lang='en-US'; rec.continuous=false; rec.interimResults=false;
+  rec.onstart=()=>{listening=true; sayStatus('listening'); orbWrap.classList.add('listening');};
+  rec.onerror=()=>{listening=false; sayStatus('idle'); orbWrap.classList.remove('listening');};
+  rec.onend=()=>{listening=false; if(!speaking) sayStatus('idle'); orbWrap.classList.remove('listening');};
+  rec.onresult=(e)=>{const text=(e.results[0]&&e.results[0][0]&&e.results[0][0].transcript)||''; if(!text) return;
+    addRow('You',text); history.push({role:'user',content:text}); chat();};
 }
 
-/* ========= Chat (OpenAI) ========= */
-async function chat(text){
-  try{
-    const payload = { messages: history.slice(-12) }; // keep last context small
-    const r = await fetch('/api/vera-chat', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if(!r.ok){ throw new Error('chat api failed'); }
-    const data = await r.json();
-    const reply = (data && data.text) || "I'm here with you.";
-    history.push({role:'assistant', content:reply});
-    addRow('VERA', reply);
-    await speak(reply);
-  }catch(err){
-    console.error(err);
-    const fallback = "I'm here. Slow everything down with me. Where in your body is most alive right now?";
-    history.push({role:'assistant', content:fallback});
-    addRow('VERA', fallback);
-    await speak(fallback);
+/* ======= Server STT (Whisper) — press & hold to record ======= */
+async function ensureStream(){
+  if(mediaStream) return;
+  mediaStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}});
+}
+function blobToBase64(blob){return new Promise((res)=>{const r=new FileReader(); r.onloadend=()=>res(r.result.split(',')[1]); r.readAsDataURL(blob);});}
+
+async function startRecording(){
+  await unlockAudio();
+  await ensureStream();
+  chunks=[];
+  const mt = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+  recorder=new MediaRecorder(mediaStream,{mimeType:mt,audioBitsPerSecond:128000});
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size>0) chunks.push(e.data)};
+  recorder.onstart=()=>{listening=true; sayStatus('listening'); orbWrap.classList.add('listening');};
+  recorder.onstop=async()=>{
+    const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'}); listening=false; sayStatus('thinking…'); orbWrap.classList.remove('listening');
+    const base64=await blobToBase64(blob);
+    try{
+      const r=await fetch('/api/vera-stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:base64,mime:blob.type||'audio/webm'})});
+      const data=await r.json(); const text=(data&&data.text)||'';
+      if(!text){ addRow('System','(No speech detected)'); return; }
+      addRow('You',text); history.push({role:'user',content:text}); chat();
+    }catch(e){console.error(e); addRow('System','Transcription failed.');}
+  };
+  recorder.start();
+}
+function stopRecording(){ if(recorder && recorder.state!=='inactive'){ recorder.stop(); }}
+
+/* ======= Interactions ======= */
+function setMode(server){ useServerSTT=server;
+  btnToggleSTT.textContent=server?'Use: Server STT':'Use: Browser STT';
+  modePill.textContent=server?'Mode: Server STT (hold to talk)':'Mode: Browser STT (tap to start/stop)';
+  hint.textContent=server?'Hold to speak • VERA will answer out loud':'Tap to speak • Tap again to stop';
+}
+setMode(true);
+
+btnToggleSTT.addEventListener('click',()=>setMode(!useServerSTT));
+btnToggleVoice.addEventListener('click',()=>{usingElevenLabs=!usingElevenLabs; btnToggleVoice.textContent='Voice: '+(usingElevenLabs?'ElevenLabs':'Browser')});
+btnTestVoice.addEventListener('click',()=>speak('This is VERA. I am right here with you.'));
+btnClear.addEventListener('click',()=>{logEl.innerHTML=''; history=history.slice(0,1); sayStatus('idle');});
+
+async function tapDown(e){
+  e.preventDefault(); await unlockAudio();
+  if(useServerSTT){ startRecording(); }
+  else{
+    if(!rec){ addRow('System','Browser STT not supported. Switch to Server STT.'); return; }
+    try{ rec.start(); }catch(_){}
   }
 }
-
-/* ========= interactions ========= */
-async function handleTap(){
-  if(speaking){ /* ignore taps while speaking */ return; }
-  if(!rec){ addRow('System','Mic not available.'); return; }
-  if(!listening){
-    try{ await rec.start(); }catch(e){ console.warn(e); }
-  }else{
-    try{ rec.stop(); }catch(e){ console.warn(e); }
-  }
+function tapUp(e){
+  e.preventDefault();
+  if(useServerSTT){ stopRecording(); }
+  else{ try{ rec.stop(); }catch(_){} }
 }
-orbWrap.addEventListener('click', handleTap);
-orbWrap.addEventListener('touchend', (e)=>{ e.preventDefault(); handleTap(); }, {passive:false});
-window.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ e.preventDefault(); handleTap(); }});
+orbWrap.addEventListener('mousedown', tapDown);
+orbWrap.addEventListener('mouseup', tapUp);
+orbWrap.addEventListener('mouseleave', ()=>{ if(useServerSTT&&listening) stopRecording(); });
+orbWrap.addEventListener('touchstart', tapDown, {passive:false});
+orbWrap.addEventListener('touchend', tapUp, {passive:false});
+window.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ if(!listening) tapDown(e); else tapUp(e); }});
 
-/* ========= UI buttons ========= */
-btnToggleVoice.addEventListener('click', ()=>{
-  usingElevenLabs = !usingElevenLabs;
-  btnToggleVoice.textContent = 'Voice: ' + (usingElevenLabs ? 'ElevenLabs' : 'Browser');
-});
-btnClear.addEventListener('click', ()=>{
-  logEl.innerHTML = '';
-  history = history.slice(0,1);
-  sayStatus('idle');
-});
-
-/* ========= greet ========= */
-addRow('VERA', 'Hi. I am with you. Tap the orb and tell me what you notice in your body.');
-(async()=>{ 
-  try{
-    await speak('Hi. I am with you. Tap the orb and tell me what you notice in your body.');
-  }catch(_){}
-})();
+/* ======= Greet ======= */
+addRow('VERA','Hi. I am with you. Hold the orb and tell me what you notice in your body.');
+(async()=>{try{await speak('Hi. I am with you. Hold the orb and tell me what you notice in your body.');}catch(_){}})();
 </script>
 </body>
 </html>
