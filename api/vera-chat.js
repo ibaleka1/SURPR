@@ -1,7 +1,6 @@
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
     const { messages } = req.body || {};
     if (!Array.isArray(messages)) return res.status(400).json({ error: 'messages[] required' });
 
@@ -10,10 +9,7 @@ export default async function handler(req, res) {
 
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         temperature: 0.7,
@@ -21,7 +17,6 @@ export default async function handler(req, res) {
         messages
       })
     });
-
     if (!r.ok) {
       const txt = await r.text().catch(() => '');
       return res.status(r.status).json({ error: 'OpenAI error', detail: txt });
