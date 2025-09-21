@@ -1,4 +1,4 @@
-export const config = { runtime: "edge" }; // works great on Vercel
+export const config = { runtime: "edge" };
 
 export default async function handler(req) {
   try {
@@ -18,9 +18,7 @@ export default async function handler(req) {
     }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
-    // IMPORTANT: set this to a clearly American voice in Vercel env:
-    // ELEVENLABS_VOICE_ID = <a US-accent voice ID>
-    const envVoiceId = process.env.ELEVENLABS_VOICE_ID;
+    const envVoiceId = process.env.ELEVENLABS_VOICE_ID; // set to a clearly American voice
     const voiceId = overrideVoiceId || envVoiceId;
 
     if (!apiKey || !voiceId) {
@@ -30,13 +28,11 @@ export default async function handler(req) {
       });
     }
 
-    // Whispery / soft defaults (tunable)
-    // Accent is controlled by the actual voiceId. Pick a US voice in your ElevenLabs dashboard.
     const whispery = {
-      stability: 0.2,          // breathier, more natural variation
-      similarity_boost: 0.9,   // cling closer to that voice’s timbre
-      style: 0.85,             // more expressive/whispery
-      use_speaker_boost: false // avoid the crisp "news anchor" effect
+      stability: 0.2,
+      similarity_boost: 0.9,
+      style: 0.85,
+      use_speaker_boost: false
     };
 
     const chosen = (stylePreset === "default")
@@ -54,9 +50,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         text,
         model_id: "eleven_multilingual_v2",
-        voice_settings: chosen,
-        // You can also return higher quality:
-        // output_format: "mp3_44100_96"
+        voice_settings: chosen
       })
     });
 
