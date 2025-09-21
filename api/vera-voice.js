@@ -1,21 +1,13 @@
-// Serverless handler for ElevenLabs TTS on Vercel (Node 20 default)
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST') {
-      res.setHeader('Allow', 'POST');
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     const { text } = req.body || {};
-    if (!text || typeof text !== 'string') {
-      return res.status(400).json({ error: 'Missing "text" (string) in body' });
-    }
+    if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
     const voiceId = process.env.ELEVENLABS_VOICE_ID;
-    if (!apiKey || !voiceId) {
-      return res.status(500).json({ error: 'Missing ELEVENLABS_API_KEY or ELEVENLABS_VOICE_ID env' });
-    }
+    if (!apiKey || !voiceId) return res.status(500).json({ error: 'Missing ElevenLabs envs' });
 
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
     const r = await fetch(url, {
@@ -30,16 +22,16 @@ module.exports = async (req, res) => {
         model_id: 'eleven_multilingual_v2',
         voice_settings: {
           stability: 0.5,
-          similarity_boost: 0.7,
-          style: 0.2,
+          similarity_boost: 0.8,
+          style: 0.35,
           use_speaker_boost: true
         }
       })
     });
 
     if (!r.ok) {
-      const detail = await r.text().catch(() => '');
-      return res.status(r.status).json({ error: 'TTS request failed', detail });
+      const err = await r.text().catch(()=> '');
+      return res.status(r.status).json({ error: 'TTS request failed', detail: err });
     }
 
     const buf = Buffer.from(await r.arrayBuffer());
@@ -49,4 +41,4 @@ module.exports = async (req, res) => {
   } catch (e) {
     return res.status(500).json({ error: 'Server error', detail: e?.message || String(e) });
   }
-};
+}
