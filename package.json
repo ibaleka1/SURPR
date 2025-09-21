@@ -1,5 +1,9 @@
 {
-  "name": "vera-neuro-orb",
+  "name": "vera-portals",
+  "version": "1.0.0",
   "private": true,
-  "license": "MIT"
+  "scripts": {
+    "vercel-build": "echo \"no build step\""
+  },
+  "engines": { "node": ">=18" }
 }
