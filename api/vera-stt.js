@@ -12,14 +12,14 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "OPENAI_API_KEY not set" });
     }
 
-    // decode base64 → Buffer → Blob → FormData
     const buffer = Buffer.from(audio, "base64");
     const blob = new Blob([buffer], { type: mime || "audio/webm" });
     const form = new FormData();
     form.append("file", blob, "input.webm");
-    form.append("model", "whisper-1"); // OpenAI Whisper model
-    // Optional: form.append("temperature", "0");
-    // Optional: form.append("language", "en");
+
+    // Prefer Whisper; if your account supports it, you may switch to gpt-4o-mini-transcribe
+    form.append("model", "whisper-1");
+    // form.append("model", "gpt-4o-mini-transcribe");
 
     const r = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST",
