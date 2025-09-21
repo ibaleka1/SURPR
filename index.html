@@ -282,7 +282,6 @@ function processInput(text){
   const r = replyFor(text);
   setCaption(r + "  (You said: “" + text + "”.)");
   orb.style.animation = 'none'; // bump
-  // quick “breath” bump
   setTimeout(()=>{ orb.style.animation='floaty 7s ease-in-out infinite'; }, 50);
   veraSpeak(r);
 }
